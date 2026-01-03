@@ -14,7 +14,7 @@ def get_db():
     return mysql.connector.connect(
         host="localhost",
         user="root",
-        password="",  # coloca a tua password MySQL
+        password="", 
         database="spotify_insight"
     )
 
