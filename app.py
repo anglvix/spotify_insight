@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, redirect, session
 import pandas as pd
 import plotly.express as px
 import mysql.connector
-from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.secret_key = "segredo_simples"
@@ -35,20 +34,17 @@ def register():
     if request.method == "POST":
         nome = request.form["nome"]
         email = request.form["email"]
-        password = generate_password_hash(request.form["password"])
+        password = request.form["password"]  # SEM HASH
 
         db = get_db()
         c = db.cursor()
-        try:
-            c.execute(
-                "INSERT INTO users (nome,email,password,role) VALUES (%s,%s,%s,%s)",
-                (nome,email,password,"user")
-            )
-            db.commit()
-        except mysql.connector.errors.IntegrityError:
-            db.close()
-            return "Email já existe!"
+        c.execute(
+            "INSERT INTO users (nome,email,password,role) VALUES (%s,%s,%s,%s)",
+            (nome,email,password,"user")
+        )
+        db.commit()
         db.close()
+
         return redirect("/login")
 
     return render_template("register.html")
@@ -64,15 +60,19 @@ def login():
 
         db = get_db()
         c = db.cursor()
-        c.execute("SELECT * FROM users WHERE email=%s", (email,))
+        c.execute(
+            "SELECT * FROM users WHERE email=%s AND password=%s",
+            (email, password)
+        )
         user = c.fetchone()
         db.close()
 
-        if user and check_password_hash(user[3], password):
-            session["user"] = user[1]  # nome
-            session["role"] = user[4]  # role
+        if user:
+            session["user"] = user[1]
+            session["role"] = user[4]
             return redirect("/dashboard")
-        return "Email ou password inválidos!"
+
+        return "Email ou password errados!"
 
     return render_template("login.html")
 
