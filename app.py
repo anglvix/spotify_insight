@@ -6,6 +6,9 @@ import mysql.connector
 app = Flask(__name__)
 app.secret_key = "segredo_simples"
 
+# Ativa debug para ver erros no terminal
+app.debug = True
+
 # -----------------------
 # Função para ligar à base de dados MySQL
 # -----------------------
