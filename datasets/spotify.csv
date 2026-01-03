@@ -1,0 +1,5 @@
+track_name,artist,album,year,play_count,duration_ms,energy,danceability
+Shape of You,Ed Sheeran,Divide,2017,150,233712,0.8,0.7
+Blinding Lights,The Weeknd,After Hours,2019,120,200040,0.9,0.8
+Levitating,Dua Lipa,Future Nostalgia,2020,100,203500,0.85,0.75
+Bad Habits,Ed Sheeran,Equals,2021,90,231000,0.78,0.72
