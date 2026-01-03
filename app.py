@@ -7,17 +7,24 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 app.secret_key = "segredo_simples"
 
-# ------------------------ MySQL
+# -----------------------
+# Função para ligar à base de dados MySQL
+# -----------------------
 def get_db():
     return mysql.connector.connect(
         host="localhost",
         user="root",
-        password="",
+        password="",  # coloca a tua password MySQL
         database="spotify_insight"
     )
 
+# -----------------------
+# Página inicial
+# -----------------------
 @app.route("/")
 def index():
+    if "user" in session:
+        return redirect("/dashboard")
     return redirect("/login")
 
 # -----------------------
@@ -32,11 +39,15 @@ def register():
 
         db = get_db()
         c = db.cursor()
-        c.execute(
-            "INSERT INTO users VALUES (NULL,%s,%s,%s,%s)",
-            (nome, email, password, "user")
-        )
-        db.commit()
+        try:
+            c.execute(
+                "INSERT INTO users (nome,email,password,role) VALUES (%s,%s,%s,%s)",
+                (nome,email,password,"user")
+            )
+            db.commit()
+        except mysql.connector.errors.IntegrityError:
+            db.close()
+            return "Email já existe!"
         db.close()
         return redirect("/login")
 
@@ -58,9 +69,10 @@ def login():
         db.close()
 
         if user and check_password_hash(user[3], password):
-            session["user"] = user[1]
-            session["role"] = user[4]
+            session["user"] = user[1]  # nome
+            session["role"] = user[4]  # role
             return redirect("/dashboard")
+        return "Email ou password inválidos!"
 
     return render_template("login.html")
 
@@ -74,18 +86,23 @@ def dashboard():
 
     df = pd.read_csv("datasets/spotify.csv")
 
+    # Tabela simples
     table = df.head(20).to_html()
 
-    top = df.groupby("artist")["play_count"].sum().reset_index()
-    fig = px.bar(top.sort_values("play_count", ascending=False).head(10),
-                 x="artist", y="play_count",
-                 title="Top 10 Artistas")
+    # Gráfico Top 10 artistas
+    top_artists = df.groupby("artist")["play_count"].sum().reset_index()
+    fig = px.bar(
+        top_artists.sort_values("play_count", ascending=False).head(10),
+        x="artist",
+        y="play_count",
+        title="Top 10 Artistas Mais Ouvidos"
+    )
     graph = fig.to_html(full_html=False)
 
     return render_template("dashboard.html", table=table, graph=graph)
 
 # -----------------------
-# Admin
+# Página Admin
 # -----------------------
 @app.route("/admin")
 def admin():
@@ -108,4 +125,8 @@ def logout():
     session.clear()
     return redirect("/login")
 
-app.run(debug=True)
+# -----------------------
+# Executar app
+# -----------------------
+if __name__ == "__main__":
+    app.run(debug=True)
