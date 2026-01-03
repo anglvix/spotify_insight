@@ -3,17 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Admin</title>
 </head>
 <body>
-    <h2>Dashboard</h2>
-    <a href="/logout">Logout</a>
-
-    <h3>Tabela</h3>
-    {{ table|safe }}
-
-    <h3>Gráfico</h3>
-    {{ graph|safe }}
+    <h2>Admin</h2>
+    <ul>
+    {% for u in users %}
+    <li>{{u[1]}} - {{u[2]}} ({{u[3]}})</li>
+    {% endfor %}
+    </ul>
 
 </body>
 </html>
