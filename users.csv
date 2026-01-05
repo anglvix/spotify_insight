@@ -1,0 +1,3 @@
+id,nome,email,password,role
+1,Admin,admin@teste.com,1234,admin
+2,Ana,ana@teste.com,1111,user
