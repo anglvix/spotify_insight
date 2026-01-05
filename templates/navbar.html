@@ -1,0 +1,37 @@
+<!-- templates/navbar.html -->
+<nav class="navbar">
+    <ul>
+        <li><a href="/dashboard">Dashboard</a></li>
+        {% if session.get('user') %}
+            <li><a href="/logout">Logout</a></li>
+            <li>Bem-vindo, {{ session['user'] }}</li>
+        {% else %}
+            <li><a href="/login">Login</a></li>
+            <li><a href="/register">Register</a></li>
+        {% endif %}
+    </ul>
+</nav>
+
+<style>
+.navbar {
+    background-color: #333;
+    overflow: hidden;
+}
+.navbar ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+.navbar ul li {
+    padding: 14px 20px;
+}
+.navbar ul li a {
+    color: white;
+    text-decoration: none;
+}
+.navbar ul li a:hover {
+    background-color: #555;
+    border-radius: 4px;
+}
+</style>

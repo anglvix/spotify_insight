@@ -6,6 +6,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <title>Dashboard</title>
 </head>
+
+<header>{% include 'navbar.html' %}</header>
+
 <body>
     <h2>Dashboard</h2>
     <a href="/logout">Logout</a>
