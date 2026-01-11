@@ -41,7 +41,13 @@ def add_user(nome, email, password):
 # -------------------------
 # Rotas
 # -------------------------
-@app.route("/", methods=["GET","POST"])
+@app.route("/", methods=["GET"])
+@app.route("/home", methods=["GET"])  # alias route for home
+def landing():
+    if "user" in session:
+        return redirect("/dashboard")
+    return render_template("landingpage.html")
+
 @app.route("/login", methods=["GET","POST"])
 def login():
     if request.method == "POST":

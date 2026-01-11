@@ -1,54 +1,28 @@
+
 body {
-    font-family: Arial, sans-serif;
-    padding: 30px;
-    max-width: 700px;
-    margin: auto;
+    background: linear-gradient(to bottom, #0a0a1a, #000000);
+    color: #e0e0e0;
+    min-height: 100vh;
 }
-
-h1 {
-    text-align: center;
-    background-color:DodgerBlue;
+.hero-gradient {
+    background: linear-gradient(135deg, rgba(26, 255, 0, 0.1), rgba(78, 78, 221, 0.1));
 }
-
-img {
-    display: block;
-    margin: auto;
+.card-hover:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,245,255,0.2);
 }
-form {
-    margin-bottom: 20px;
+.badge-primary {
+    background: linear-gradient(90deg, #00f5ff, #9d4edd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 600;
 }
-
-input {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    margin-bottom: 15px;
+.btn-gradient {
+    background: linear-gradient(90deg, #00f5ff, #9d4edd);
+    transition: all 0.3s;
 }
-
-button {
-    padding: 10px;
-    background-color:darkgray;
-    cursor: pointer;
+.btn-gradient:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0,245,255,0.4);
 }
-
-.navbar {
-    background-color: #333;
-    overflow: hidden;
-}
-.navbar ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-}
-.navbar ul li {
-    padding: 14px 20px;
-}
-.navbar ul li a {
-    color: white;
-    text-decoration: none;
-}
-.navbar ul li a:hover {
-    background-color: #555;
-    border-radius: 4px;
-}
+.hero-full { min-height: calc(100vh - var(--header-h)); }
