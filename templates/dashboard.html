@@ -37,15 +37,23 @@
 
 <header>{% include 'navbar.html' %}</header>
 
-<body>
-    <h2>Dashboard</h2>
-    <a href="/logout">Logout</a>
+<body class="bg-transparent">
+    <div class="container mx-auto px-6 pt-20">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-3xl font-semibold text-white tracking-tight">Dashboard</h2>
+      </div>
 
-    <h3>Tabela</h3>
-    {{ table|safe }}
+      <div class="space-y-8">
+        <section>
+          <h3 class="text-xl font-semibold text-white/90 mb-4">Tabela</h3>
+          {{ table|safe }}
+        </section>
 
-    <h3>Gráfico</h3>
-    {{ graph|safe }}
-
+        <section>
+          <h3 class="text-xl font-semibold text-white/90 mb-4">Gráfico</h3>
+          {{ graph|safe }}
+        </section>
+      </div>
+    </div>
 </body>
 </html>

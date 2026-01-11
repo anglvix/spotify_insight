@@ -3,6 +3,7 @@ body {
     background: linear-gradient(to bottom, #0a0a1a, #000000);
     color: #e0e0e0;
     min-height: 100vh;
+    margin-top: 30px;
 }
 .hero-gradient {
     background: linear-gradient(135deg, rgba(26, 255, 0, 0.1), rgba(78, 78, 221, 0.1));
@@ -10,19 +11,5 @@ body {
 .card-hover:hover {
     transform: translateY(-10px);
     box-shadow: 0 20px 40px rgba(0,245,255,0.2);
-}
-.badge-primary {
-    background: linear-gradient(90deg, #00f5ff, #9d4edd);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-weight: 600;
-}
-.btn-gradient {
-    background: linear-gradient(90deg, #00f5ff, #9d4edd);
-    transition: all 0.3s;
-}
-.btn-gradient:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(0,245,255,0.4);
 }
 .hero-full { min-height: calc(100vh - var(--header-h)); }
