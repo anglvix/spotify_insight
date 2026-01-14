@@ -45,8 +45,74 @@
 
       <div class="space-y-8">
         <section>
-          <h3 class="text-xl font-semibold text-white/90 mb-4">Tabela</h3>
-          {{ table|safe }}
+            <h3 class="text-xl font-semibold text-white/90 mb-4">Tabela</h3>
+
+            <!-- FILTROS -->
+            <form method="get" class="mb-6 flex flex-wrap gap-4 items-end">
+
+                <!-- Artistas -->
+                <div>
+                <label class="block text-sm text-white/70 mb-1">Artistas</label>
+                <select name="artist" multiple
+                    class="bg-gray-900 text-white px-3 py-2 rounded-lg border border-white/10 max-h-40 overflow-y-auto">
+                    {% for a in artists %}
+                    <option value="{{ a }}" {% if a in selected_artist %}selected{% endif %}>
+                        {{ a }}
+                    </option>
+                    {% endfor %}
+                </select>
+                </div>
+
+                <!-- Álbuns -->
+                <div>
+                <label class="block text-sm text-white/70 mb-1">Álbuns</label>
+                <select name="album" multiple
+                    class="bg-gray-900 text-white px-3 py-2 rounded-lg border border-white/10 max-h-40 overflow-y-auto">
+                    {% for alb in albums %}
+                    <option value="{{ alb }}" {% if alb in selected_album %}selected{% endif %}>
+                        {{ alb }}
+                    </option>
+                    {% endfor %}
+                </select>
+                </div>
+
+                <!-- Plays mínimos -->
+                <div>
+                <label class="block text-sm text-white/70 mb-1">Plays mínimos</label>
+                <input type="number" name="min_plays"
+                    value="{{ min_plays or '' }}"
+                    class="bg-gray-900 text-white px-3 py-2 rounded-lg border border-white/10"
+                    placeholder="Ex: 1000000">
+                </div>
+
+                <!-- Ano mínimo -->
+                <div>
+                <label class="block text-sm text-white/70 mb-1">Ano mínimo</label>
+                <input type="number" name="min_year"
+                    value="{{ min_year or '' }}"
+                    class="bg-gray-900 text-white px-3 py-2 rounded-lg border border-white/10"
+                    placeholder="Ex: 2010">
+                </div>
+
+                <!-- Ano máximo -->
+                <div>
+                <label class="block text-sm text-white/70 mb-1">Ano máximo</label>
+                <input type="number" name="max_year"
+                    value="{{ max_year or '' }}"
+                    class="bg-gray-900 text-white px-3 py-2 rounded-lg border border-white/10"
+                    placeholder="Ex: 2023">
+                </div>
+
+                <!-- Botão -->
+                <button type="submit"
+                class="px-5 py-2 rounded-lg bg-primary text-black font-semibold hover:opacity-80 transition">
+                Filtrar
+                </button>
+
+            </form>
+
+            <!-- TABELA -->
+            {{ table|safe }}
         </section>
 
         <section>

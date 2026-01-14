@@ -143,6 +143,38 @@ def dashboard():
 
     df = pd.read_csv(SPOTIFY_CSV)
 
+    selected_artist = request.args.getlist("artist")
+    selected_album = request.args.getlist("album")
+    min_plays = request.args.get("min_plays")
+    min_year = request.args.get("min_year")
+    max_year = request.args.get("max_year")
+    artists = sorted(df["artist"].unique())
+    albums = sorted(df["album"].unique())
+
+    # Filter df
+    if selected_artist:
+        df = df[df["artist"].isin(selected_artist)]
+    if selected_album:
+        df = df[df["album"].isin(selected_album)]
+    if min_plays:
+        try:
+            min_plays_int = int(min_plays)
+            df = df[df["play_count"] >= min_plays_int]
+        except ValueError:
+            pass
+    if min_year:
+        try:
+            min_year_int = int(min_year)
+            df = df[df["year"] >= min_year_int]
+        except ValueError:
+            pass
+    if max_year:
+        try:
+            max_year_int = int(max_year)
+            df = df[df["year"] <= max_year_int]
+        except ValueError:
+            pass
+
     # Criar tabela HTML (com estilo Tailwind)
     table_html = df.head(20).to_html(classes="min-w-full divide-y divide-gray-200", index=False)
     # Estilizar cabeçalho e células com classes Tailwind
@@ -187,7 +219,7 @@ def dashboard():
     else:
         graph_html = "<p>CSV não tem colunas 'artist' e 'play_count'</p>"
 
-    return render_template("dashboard.html", user=session["user"], table=table_html, graph=graph_html)
+    return render_template("dashboard.html", user=session["user"], table=table_html, graph=graph_html, artists=artists, selected_artist=selected_artist, min_plays=min_plays, albums=albums, selected_album=selected_album, min_year=min_year, max_year=max_year)
 
 @app.route("/admin")
 def admin():
