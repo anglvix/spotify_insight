@@ -76,7 +76,9 @@ def root_landing():
     Isto permite ao utilizador aceder à página pública de apresentação sem ser
     automaticamente redirecionado para o dashboard.
     """
-    return render_template("landingpage.html")
+    # Passa informação se o utilizador está logado (user ou admin)
+    is_logged_in = 'user' in session and 'role' in session
+    return render_template("landingpage.html", is_logged_in=is_logged_in)
 
 @app.route("/home", methods=["GET"])  # página 'home' acessível mesmo estando autenticado
 def home():
@@ -84,7 +86,9 @@ def home():
     Página home pública. Permite aceder ao conteúdo de home mesmo quando o utilizador
     está autenticado (não redireciona para o dashboard).
     """
-    return render_template("landingpage.html")
+    # Passa informação se o utilizador está logado (user ou admin)
+    is_logged_in = 'user' in session and 'role' in session
+    return render_template("landingpage.html", is_logged_in=is_logged_in)
 
 @app.route("/login", methods=["GET","POST"])
 def login():
@@ -143,53 +147,193 @@ def dashboard():
 
     df = pd.read_csv(SPOTIFY_CSV)
 
-    selected_artist = request.args.getlist("artist")
-    selected_album = request.args.getlist("album")
-    min_plays = request.args.get("min_plays")
-    min_year = request.args.get("min_year")
-    max_year = request.args.get("max_year")
-    artists = sorted(df["artist"].unique())
-    albums = sorted(df["album"].unique())
+    # Obter filtros da tabela
+    table_min_plays = request.args.get("table_min_plays")
+    table_min_year = request.args.get("table_min_year")
+    table_max_year = request.args.get("table_max_year")
 
-    # Filter df
-    if selected_artist:
-        df = df[df["artist"].isin(selected_artist)]
-    if selected_album:
-        df = df[df["album"].isin(selected_album)]
-    if min_plays:
+    # Obter filtros do gráfico
+    graph_min_plays = request.args.get("graph_min_plays")
+    graph_min_year = request.args.get("graph_min_year")
+    graph_max_year = request.args.get("graph_max_year")
+    graph_top_artists = request.args.get("graph_top_artists", "10")
+
+    # Filtrar dados para a TABELA
+    df_table = df.copy()
+    if table_min_plays:
         try:
-            min_plays_int = int(min_plays)
-            df = df[df["play_count"] >= min_plays_int]
+            table_min_plays_int = int(table_min_plays)
+            df_table = df_table[df_table["play_count"] >= table_min_plays_int]
         except ValueError:
             pass
-    if min_year:
+    if table_min_year:
         try:
-            min_year_int = int(min_year)
-            df = df[df["year"] >= min_year_int]
+            table_min_year_int = int(table_min_year)
+            df_table = df_table[df_table["year"] >= table_min_year_int]
         except ValueError:
             pass
-    if max_year:
+    if table_max_year:
         try:
-            max_year_int = int(max_year)
-            df = df[df["year"] <= max_year_int]
+            table_max_year_int = int(table_max_year)
+            df_table = df_table[df_table["year"] <= table_max_year_int]
         except ValueError:
             pass
 
-    # Criar tabela HTML (com estilo Tailwind)
-    table_html = df.head(20).to_html(classes="min-w-full divide-y divide-gray-200", index=False)
-    # Estilizar cabeçalho e células com classes Tailwind
-    table_html = table_html.replace('<thead>', '<thead class="bg-gray-800">')
-    table_html = table_html.replace('<th>', '<th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">')
-    table_html = table_html.replace('<td>', '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">')
-    # Remover atributo border (pandas adiciona border="1")
-    table_html = table_html.replace('border="1"', '')
+    # Filtrar dados para o GRÁFICO
+    df_graph = df.copy()
+    if graph_min_plays:
+        try:
+            graph_min_plays_int = int(graph_min_plays)
+            df_graph = df_graph[df_graph["play_count"] >= graph_min_plays_int]
+        except ValueError:
+            pass
+    if graph_min_year:
+        try:
+            graph_min_year_int = int(graph_min_year)
+            df_graph = df_graph[df_graph["year"] >= graph_min_year_int]
+        except ValueError:
+            pass
+    if graph_max_year:
+        try:
+            graph_max_year_int = int(graph_max_year)
+            df_graph = df_graph[df_graph["year"] <= graph_max_year_int]
+        except ValueError:
+            pass
+
+    # Criar tabela HTML customizada com filtros nos cabeçalhos
+    # Converter duração de ms para minutos para mostrar
+    df_table_display = df_table.copy()
+    if 'duration_ms' in df_table_display.columns:
+        df_table_display['duration_min'] = (df_table_display['duration_ms'] / 60000).round(2)
+        df_table_display = df_table_display.drop(columns=['duration_ms'])
+    
+    # Remover colunas de energia e dançabilidade
+    columns_to_remove = ['energy', 'danceability']
+    df_table_display = df_table_display.drop(columns=[col for col in columns_to_remove if col in df_table_display.columns], errors='ignore')
+    
+    # Traduzir nomes das colunas para português
+    column_names = {
+        'track_name': 'Música',
+        'artist': 'Artista',
+        'album': 'Álbum',
+        'year': 'Ano',
+        'play_count': 'Reproduções',
+        'duration_min': 'Duração (min)'
+    }
+    df_table_display = df_table_display.rename(columns=column_names)
+    
+    # Colunas que não devem ter filtro
+    no_filter_columns = ['Duração (min)', 'Reproduções']
+    
+    # Criar tabela HTML personalizada com dropdowns nos cabeçalhos
+    table_html = '<table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-800"><tr>'
+    
+    # Criar cabeçalhos com ícone de filtro e ordenação
+    for col_idx, col in enumerate(df_table_display.columns):
+        # Verificar se esta coluna deve ter filtro
+        has_filter = col not in no_filter_columns
+        
+        if has_filter:
+            table_html += f'''
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider relative">
+            <div class="flex items-center justify-between">
+                <span onclick="sortTable({col_idx})" class="cursor-pointer hover:text-primary transition flex items-center">
+                    {col}
+                    <svg class="w-4 h-4 ml-1 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                    </svg>
+                </span>
+                <button onclick="toggleColumnFilter({col_idx})" type="button" class="ml-2 text-gray-500 hover:text-primary transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                    </svg>
+                </button>
+            </div>
+            <div id="filter-{col_idx}" class="hidden absolute z-10 mt-2 bg-gray-800 rounded-lg shadow-lg border border-white/10 p-3 min-w-[200px]">
+                <input type="text" onkeyup="filterColumn({col_idx})" placeholder="Filtrar {col}..." 
+                    class="w-full bg-gray-900 text-white px-3 py-2 rounded border border-white/10 text-sm focus:border-primary focus:outline-none">
+            </div>
+        </th>
+            '''
+        else:
+            # Cabeçalho sem filtro, apenas com ordenação
+            table_html += f'''
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+            <span onclick="sortTable({col_idx})" class="cursor-pointer hover:text-primary transition flex items-center">
+                {col}
+                <svg class="w-4 h-4 ml-1 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                </svg>
+            </span>
+        </th>
+            '''
+    
+    table_html += '</tr></thead><tbody class="bg-gray-900 divide-y divide-gray-700">'
+    
+    # Adicionar linhas
+    for _, row in df_table_display.iterrows():
+        table_html += '<tr class="hover:bg-gray-800 transition">'
+        for val in row:
+            table_html += f'<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{val}</td>'
+        table_html += '</tr>'
+    
+    table_html += '</tbody></table>'
+    
     # Envolver numa caixa responsiva com sombra
     table_html = f'<div class="overflow-x-auto"><div class="align-middle inline-block min-w-full shadow overflow-hidden sm:rounded-lg">{table_html}</div></div>'
 
-    # Criar gráfico Plotly: Top 10 artistas por play_count
-    if "artist" in df.columns and "play_count" in df.columns:
-        top_artists = df.groupby("artist")["play_count"].sum().reset_index()
-        top_artists = top_artists.sort_values("play_count", ascending=False).head(10)
+    # Calcular estatísticas a partir dos dados filtrados da tabela
+    def format_number(num, is_decimal=False):
+        if num >= 1000000:
+            return f"{num/1000000:.3f}M"
+        elif num >= 1000:
+            return f"{num/1000:.3f}K"
+        else:
+            if is_decimal:
+                return f"{num:.2f}"
+            return str(int(num))
+    
+    total_streams = df_table['play_count'].sum() if 'play_count' in df_table.columns else 0
+    # Calcular tempo total de audição: duração * plays de cada música
+    if 'duration_ms' in df_table.columns and 'play_count' in df_table.columns:
+        total_duration_ms = (df_table['duration_ms'] * df_table['play_count']).sum()
+    else:
+        total_duration_ms = 0
+    total_minutes = total_duration_ms / 60000  # Converter ms para minutos
+    total_tracks = len(df_table)
+    total_artists = df_table['artist'].nunique() if 'artist' in df_table.columns else 0
+    total_albums = df_table['album'].nunique() if 'album' in df_table.columns else 0
+    
+    # Calcular top géneros
+    top_genres = []
+    if 'genre' in df_table.columns and 'play_count' in df_table.columns:
+        genre_stats = df_table.groupby('genre')['play_count'].sum().reset_index()
+        genre_stats = genre_stats.sort_values('play_count', ascending=False).head(5)
+        for _, row in genre_stats.iterrows():
+            top_genres.append({
+                'name': row['genre'],
+                'plays': format_number(row['play_count'])
+            })
+    
+    stats = {
+        'total_streams': format_number(total_streams),
+        'total_minutes': format_number(total_minutes, is_decimal=True),
+        'total_tracks': total_tracks,
+        'total_artists': total_artists,
+        'total_albums': total_albums,
+        'top_genres': top_genres
+    }
+
+    # Criar gráfico Plotly: Top N artistas por play_count
+    if "artist" in df_graph.columns and "play_count" in df_graph.columns:
+        try:
+            top_n = int(graph_top_artists)
+            top_n = max(1, min(top_n, 50))  # Limitar entre 1 e 50
+        except (ValueError, TypeError):
+            top_n = 10
+        
+        top_artists = df_graph.groupby("artist")["play_count"].sum().reset_index()
+        top_artists = top_artists.sort_values("play_count", ascending=False).head(top_n)
 
         # Plotly: estilo escuro e paleta do site (Tailwind green-400 → blue-500)
         primary = "#34D399"  # tailwind green-400
@@ -198,20 +342,20 @@ def dashboard():
             top_artists,
             x="artist",
             y="play_count",
-            title="Top 10 Artistas",
+            title=f"Top {top_n} Artistas",
             color="play_count",
             color_continuous_scale=[primary, secondary],
             template="plotly_dark",
-            labels={"play_count": "Plays", "artist": "Artista"},
+            labels={"play_count": "Reproduções", "artist": "Artista"},
         )
-        fig.update_traces(marker_line_width=0, opacity=0.95, hovertemplate="<b>%{x}</b><br>Plays: %{y}<extra></extra>")
+        fig.update_traces(marker_line_width=0, opacity=0.95, hovertemplate="<b>%{x}</b><br>Reproduções: %{y}<extra></extra>")
         fig.update_layout(
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(family="Inter, sans-serif", color="#e0e0e0"),
-            title=dict(font=dict(size=18, color=primary)),
+            title=dict(font=dict(size=30, color="#ffffff", family="Inter, sans-serif"), font_weight=700),
             margin=dict(l=40, r=20, t=50, b=80),
-            coloraxis_colorbar=dict(title="Plays", tickfont=dict(color="#e0e0e0")),
+            coloraxis_colorbar=dict(title="Reproduções", tickfont=dict(color="#e0e0e0")),
         )
         fig.update_xaxes(tickangle=-45, showgrid=False, tickfont=dict(color="#e0e0e0"))
         fig.update_yaxes(gridcolor="rgba(255,255,255,0.06)", tickfont=dict(color="#e0e0e0"))
@@ -219,7 +363,20 @@ def dashboard():
     else:
         graph_html = "<p>CSV não tem colunas 'artist' e 'play_count'</p>"
 
-    return render_template("dashboard.html", user=session["user"], table=table_html, graph=graph_html, artists=artists, selected_artist=selected_artist, min_plays=min_plays, albums=albums, selected_album=selected_album, min_year=min_year, max_year=max_year)
+    return render_template(
+        "dashboard.html", 
+        user=session["user"], 
+        table=table_html, 
+        graph=graph_html, 
+        stats=stats,
+        table_min_plays=table_min_plays, 
+        table_min_year=table_min_year, 
+        table_max_year=table_max_year,
+        graph_min_plays=graph_min_plays,
+        graph_min_year=graph_min_year,
+        graph_max_year=graph_max_year,
+        graph_top_artists=graph_top_artists
+    )
 
 @app.route("/admin")
 def admin():

@@ -1,5 +1,96 @@
-track_name,artist,album,year,play_count,duration_ms,energy,danceability
-Shape of You,Ed Sheeran,Divide,2017,150,233712,0.8,0.7
-Blinding Lights,The Weeknd,After Hours,2019,120,200040,0.9,0.8
-Levitating,Dua Lipa,Future Nostalgia,2020,100,203500,0.85,0.75
-Bad Habits,Ed Sheeran,Equals,2021,90,231000,0.78,0.72
+track_name,artist,album,year,play_count,duration_ms,energy,danceability,genre
+Shape of You,Ed Sheeran,Divide,2017,127,233712,0.8,0.7,Pop
+Blinding Lights,The Weeknd,After Hours,2020,245,200040,0.9,0.8,R&B
+Levitating,Dua Lipa,Future Nostalgia,2020,189,203500,0.85,0.75,Pop
+Bad Habits,Ed Sheeran,Equals,2021,156,231000,0.78,0.72,Pop
+Watermelon Sugar,Harry Styles,Fine Line,2019,98,174000,0.82,0.65,Pop
+As It Was,Harry Styles,Harry's House,2022,312,167000,0.7,0.72,Pop
+Anti-Hero,Taylor Swift,Midnights,2022,278,200690,0.65,0.58,Pop
+Cruel Summer,Taylor Swift,Lover,2019,201,178426,0.7,0.55,Pop
+Shake It Off,Taylor Swift,1989,2014,87,219200,0.8,0.65,Pop
+Blank Space,Taylor Swift,1989,2014,94,231840,0.7,0.6,Pop
+Someone Like You,Adele,21,2011,45,285133,0.4,0.5,Pop
+Rolling in the Deep,Adele,21,2011,62,228293,0.8,0.75,Pop
+Hello,Adele,25,2015,134,295493,0.45,0.5,Pop
+Easy On Me,Adele,30,2021,167,224000,0.4,0.6,Pop
+Drivers License,Olivia Rodrigo,SOUR,2021,223,242000,0.42,0.65,Alternative
+Good 4 U,Olivia Rodrigo,SOUR,2021,198,178000,0.85,0.56,Alternative
+Vampire,Olivia Rodrigo,GUTS,2023,145,219000,0.5,0.51,Alternative
+Heat Waves,Glass Animals,Dreamland,2020,176,238000,0.76,0.77,Indie
+Starboy,The Weeknd,Starboy,2016,112,230453,0.59,0.68,R&B
+Save Your Tears,The Weeknd,After Hours,2020,188,215627,0.82,0.68,R&B
+Die For You,The Weeknd,Starboy,2016,91,260253,0.61,0.61,R&B
+Flowers,Miley Cyrus,Endless Summer Vacation,2023,289,200107,0.7,0.71,Pop Rock
+Wrecking Ball,Miley Cyrus,Bangerz,2013,67,221413,0.62,0.57,Pop Rock
+Angels Like You,Miley Cyrus,Plastic Hearts,2020,52,199000,0.55,0.63,Pop Rock
+Stay,The Kid LAROI & Justin Bieber,F*ck Love 3,2021,234,141806,0.76,0.76,Pop
+Peaches,Justin Bieber,Justice,2021,178,198082,0.58,0.68,Pop
+Love Yourself,Justin Bieber,Purpose,2015,89,233720,0.44,0.6,Pop
+Sorry,Justin Bieber,Purpose,2015,102,200787,0.69,0.75,Pop
+One Dance,Drake,Views,2016,156,173987,0.79,0.79,Hip Hop
+God's Plan,Drake,Scorpion,2018,187,198973,0.45,0.75,Hip Hop
+Hotline Bling,Drake,Views,2016,98,267093,0.52,0.81,Hip Hop
+In My Feelings,Drake,Scorpion,2018,134,217925,0.63,0.84,Hip Hop
+Sunflower,Post Malone & Swae Lee,Spider-Man: Into the Spider-Verse,2018,201,158040,0.48,0.76,Hip Hop
+Circles,Post Malone,Hollywood's Bleeding,2019,167,215280,0.69,0.7,Hip Hop
+Rockstar,Post Malone,Beerbongs & Bentleys,2018,145,218147,0.52,0.74,Hip Hop
+I Like You,Post Malone & Doja Cat,Twelve Carat Toothache,2022,123,195893,0.52,0.73,Hip Hop
+Say So,Doja Cat,Hot Pink,2020,189,237733,0.81,0.94,R&B
+Woman,Doja Cat,Planet Her,2021,156,172626,0.81,0.77,R&B
+Kiss Me More,Doja Cat & SZA,Planet Her,2021,198,208493,0.76,0.76,R&B
+Paint The Town Red,Doja Cat,Scarlet,2023,234,210560,0.64,0.8,R&B
+Kill Bill,SZA,SOS,2022,267,153000,0.51,0.82,R&B
+Snooze,SZA,SOS,2022,223,201000,0.4,0.69,R&B
+All The Stars,SZA & Kendrick Lamar,Black Panther,2018,112,232000,0.59,0.49,Hip Hop
+Lucid Dreams,Juice WRLD,Goodbye & Good Riddance,2018,178,239836,0.51,0.51,Hip Hop
+All Girls Are The Same,Juice WRLD,Goodbye & Good Riddance,2018,87,165786,0.55,0.74,Hip Hop
+Robbery,Juice WRLD,Death Race for Love,2019,94,240000,0.58,0.66,Hip Hop
+Wishing Well,Juice WRLD,Legends Never Die,2020,76,194000,0.65,0.43,Hip Hop
+Sicko Mode,Travis Scott,ASTROWORLD,2018,145,312820,0.78,0.83,Hip Hop
+Goosebumps,Travis Scott,Birds in the Trap Sing McKnight,2016,123,243837,0.73,0.84,Hip Hop
+Highest in the Room,Travis Scott,Highest in the Room,2019,98,175933,0.57,0.73,Hip Hop
+FE!N,Travis Scott,UTOPIA,2023,189,186000,0.82,0.88,Hip Hop
+HUMBLE.,Kendrick Lamar,DAMN.,2017,167,177000,0.91,0.91,Hip Hop
+DNA.,Kendrick Lamar,DAMN.,2017,89,185946,0.93,0.63,Hip Hop
+Swimming Pools,Kendrick Lamar,good kid m.A.A.d city,2012,67,313413,0.48,0.84,Hip Hop
+Money Trees,Kendrick Lamar,good kid m.A.A.d city,2012,78,386560,0.59,0.74,Hip Hop
+Happier Than Ever,Billie Eilish,Happier Than Ever,2021,156,297626,0.39,0.48,Alternative
+Bad Guy,Billie Eilish,When We All Fall Asleep Where Do We Go?,2019,234,194088,0.56,0.7,Alternative
+Lovely,Billie Eilish & Khalid,13 Reasons Why,2018,112,200186,0.31,0.35,Alternative
+Ocean Eyes,Billie Eilish,Don't Smile at Me,2016,98,200346,0.35,0.66,Alternative
+Location,Khalid,American Teen,2017,87,219293,0.52,0.61,R&B
+Young Dumb & Broke,Khalid,American Teen,2017,94,222213,0.66,0.64,R&B
+Talk,Khalid,Free Spirit,2019,67,198493,0.61,0.76,R&B
+Better,Khalid,Free Spirit,2019,52,230000,0.68,0.52,R&B
+Señorita,Shawn Mendes & Camila Cabello,Shawn Mendes,2019,198,190960,0.76,0.75,Pop
+There's Nothing Holdin' Me Back,Shawn Mendes,Illuminate,2016,134,199440,0.86,0.85,Pop
+Stitches,Shawn Mendes,Handwritten,2015,89,206746,0.75,0.69,Pop
+Treat You Better,Shawn Mendes,Illuminate,2016,76,187600,0.64,0.63,Pop
+Havana,Camila Cabello,Camila,2017,212,217307,0.76,0.77,Latin
+Never Be the Same,Camila Cabello,Camila,2017,98,226893,0.61,0.81,Latin
+Bam Bam,Camila Cabello & Ed Sheeran,Familia,2022,145,216000,0.79,0.85,Latin
+I Don't Care,Ed Sheeran & Justin Bieber,No.6 Collaborations Project,2019,178,219947,0.68,0.8,Pop
+Perfect,Ed Sheeran,Divide,2017,167,263400,0.45,0.6,Pop
+Thinking Out Loud,Ed Sheeran,X,2014,123,281560,0.45,0.78,Pop
+Photograph,Ed Sheeran,X,2014,89,258873,0.39,0.61,Pop
+Castle on the Hill,Ed Sheeran,Divide,2017,102,261321,0.83,0.49,Pop
+Shivers,Ed Sheeran,Equals,2021,156,207160,0.86,0.72,Pop
+Dance Monkey,Tones and I,The Kids Are Coming,2019,245,209438,0.59,0.82,Pop
+Beggin',Måneskin,Teatro d'ira - Vol. I,2021,189,211560,0.8,0.71,Rock
+I Wanna Be Your Slave,Måneskin,Teatro d'ira - Vol. I,2021,134,152613,0.93,0.66,Rock
+Supermodel,Måneskin,Rush!,2023,98,162000,0.82,0.64,Rock
+Calm Down,Rema & Selena Gomez,Rave & Roses,2022,212,239317,0.83,0.85,Afrobeats
+Without Me,Halsey,Manic,2018,178,201661,0.64,0.76,Pop
+Eastside,Benny Blanco & Halsey & Khalid,Eastside,2018,112,173800,0.67,0.76,Pop
+Closer,The Chainsmokers & Halsey,Collage,2016,198,244960,0.62,0.75,Electronic
+Don't Let Me Down,The Chainsmokers & Daya,Collage,2016,145,208027,0.69,0.72,Electronic
+Something Just Like This,The Chainsmokers & Coldplay,Memories...Do Not Open,2017,167,247160,0.64,0.54,Electronic
+Wake Me Up,Avicii,True,2013,134,247333,0.68,0.52,Electronic
+The Nights,Avicii,The Days / Nights,2014,89,174826,0.68,0.59,Electronic
+Waiting For Love,Avicii,Stories,2015,98,230733,0.66,0.68,Electronic
+Lonely Together,Avicii & Rita Ora,Avīci (01),2017,67,182733,0.66,0.78,Electronic
+Memories,Maroon 5,Jordi,2019,156,189493,0.42,0.55,Pop Rock
+Girls Like You,Maroon 5 & Cardi B,Red Pill Blues,2018,189,235546,0.68,0.87,Pop Rock
+Sugar,Maroon 5,V,2015,145,235493,0.65,0.75,Pop Rock
+Moves Like Jagger,Maroon 5 & Christina Aguilera,Hands All Over,2011,123,201413,0.72,0.88,Pop Rock
+payphone,Maroon 5 & Wiz Khalifa,Overexposed,2012,112,231906,0.66,0.67,Pop Rock

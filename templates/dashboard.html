@@ -43,44 +43,127 @@
         <h2 class="text-3xl font-semibold text-white tracking-tight">Dashboard</h2>
       </div>
 
+      <!-- ESTATÍSTICAS -->
+      <section class="mb-8">
+        <h3 class="text-2xl font-bold text-white mb-6">Stats</h3>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
+          <div class="bg-gray-900/50 rounded-lg p-6 border border-white/10 hover:border-primary/50 transition">
+            <div class="text-4xl font-bold text-white mb-2">{{ stats.total_streams }}</div>
+            <div class="text-gray-400 text-sm uppercase tracking-wide">reproduções</div>
+          </div>
+          <div class="bg-gray-900/50 rounded-lg p-6 border border-white/10 hover:border-primary/50 transition">
+            <div class="text-4xl font-bold text-white mb-2">{{ stats.total_minutes }}</div>
+            <div class="text-gray-400 text-sm uppercase tracking-wide">minutos</div>
+          </div>
+          <div class="bg-gray-900/50 rounded-lg p-6 border border-white/10 hover:border-primary/50 transition">
+            <div class="text-4xl font-bold text-white mb-2">{{ stats.total_tracks }}</div>
+            <div class="text-gray-400 text-sm uppercase tracking-wide">musicas</div>
+          </div>
+          <div class="bg-gray-900/50 rounded-lg p-6 border border-white/10 hover:border-primary/50 transition">
+            <div class="text-4xl font-bold text-white mb-2">{{ stats.total_artists }}</div>
+            <div class="text-gray-400 text-sm uppercase tracking-wide">artistas</div>
+          </div>
+          <div class="bg-gray-900/50 rounded-lg p-6 border border-white/10 hover:border-primary/50 transition">
+            <div class="text-4xl font-bold text-white mb-2">{{ stats.total_albums }}</div>
+            <div class="text-gray-400 text-sm uppercase tracking-wide">álbuns</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TOP GÉNEROS -->
+      {% if stats.top_genres %}
+      <section class="mb-8">
+        <h3 class="text-2xl font-bold text-white mb-6">Top Genres</h3>
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+          {% for genre in stats.top_genres %}
+          <div class="bg-gray-900/30 rounded-full px-6 py-3 border border-white/10 flex items-center justify-between hover:border-primary/50 transition">
+            <span class="text-white font-medium">{{ genre.name }}</span>
+            <span class="text-gray-400 text-sm ml-3">{{ genre.plays }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+      {% endif %}
+
       <div class="space-y-8">
+        <section class="my-16">
+          {{ graph|safe }}
+
+          <!-- FILTROS GRÁFICO -->
+          <form method="get" class="mt-6 flex flex-wrap gap-4 items-end justify-center">
+            <input type="hidden" name="filter_type" value="graph">
+
+            <!-- Número de artistas -->
+            <div>
+              <label class="block text-sm text-white/70 mb-1">Top Artistas</label>
+              <input type="number" name="graph_top_artists"
+                  value="{{ graph_top_artists or 10 }}"
+                  min="1" max="50"
+                  class="bg-gray-900 text-white px-3 py-2 rounded-lg border border-white/10"
+                  placeholder="Ex: 10">
+            </div>
+
+            <!-- Reproduções mínimas -->
+            <div>
+              <label class="block text-sm text-white/70 mb-1">Reproduções mínimas</label>
+              <input type="number" name="graph_min_plays"
+                  value="{{ graph_min_plays or '' }}"
+                  class="bg-gray-900 text-white px-3 py-2 rounded-lg border border-white/10"
+                  placeholder="Ex: 1000000">
+            </div>
+
+            <!-- Ano mínimo -->
+            <div>
+              <label class="block text-sm text-white/70 mb-1">Ano mínimo</label>
+              <input type="number" name="graph_min_year"
+                  value="{{ graph_min_year or '' }}"
+                  class="bg-gray-900 text-white px-3 py-2 rounded-lg border border-white/10"
+                  placeholder="Ex: 2010">
+            </div>
+
+            <!-- Ano máximo -->
+            <div>
+              <label class="block text-sm text-white/70 mb-1">Ano máximo</label>
+              <input type="number" name="graph_max_year"
+                  value="{{ graph_max_year or '' }}"
+                  class="bg-gray-900 text-white px-3 py-2 rounded-lg border border-white/10"
+                  placeholder="Ex: 2023">
+            </div>
+
+            <!-- Preserve table filters -->
+            {% if table_min_plays %}
+            <input type="hidden" name="table_min_plays" value="{{ table_min_plays }}">
+            {% endif %}
+            {% if table_min_year %}
+            <input type="hidden" name="table_min_year" value="{{ table_min_year }}">
+            {% endif %}
+            {% if table_max_year %}
+            <input type="hidden" name="table_max_year" value="{{ table_max_year }}">
+            {% endif %}
+            {% if graph_top_artists %}
+            <input type="hidden" name="graph_top_artists" value="{{ graph_top_artists }}">
+            {% endif %}
+
+            <!-- Botão -->
+            <button type="submit"
+              class="px-5 py-2 rounded-lg bg-secondary text-white font-semibold hover:opacity-80 transition">
+              Filtrar Gráfico
+            </button>
+          </form>
+        </section>
+
         <section>
-            <h3 class="text-xl font-semibold text-white/90 mb-4">Tabela</h3>
+            <h3 class="text-3xl font-bold text-white mb-6">As suas músicas</h3>
 
-            <!-- FILTROS -->
+            <!-- FILTROS TABELA -->
             <form method="get" class="mb-6 flex flex-wrap gap-4 items-end">
+                <input type="hidden" name="filter_type" value="table">
 
-                <!-- Artistas -->
+                <!-- Reproduções mínimas -->
                 <div>
-                <label class="block text-sm text-white/70 mb-1">Artistas</label>
-                <select name="artist" multiple
-                    class="bg-gray-900 text-white px-3 py-2 rounded-lg border border-white/10 max-h-40 overflow-y-auto">
-                    {% for a in artists %}
-                    <option value="{{ a }}" {% if a in selected_artist %}selected{% endif %}>
-                        {{ a }}
-                    </option>
-                    {% endfor %}
-                </select>
-                </div>
-
-                <!-- Álbuns -->
-                <div>
-                <label class="block text-sm text-white/70 mb-1">Álbuns</label>
-                <select name="album" multiple
-                    class="bg-gray-900 text-white px-3 py-2 rounded-lg border border-white/10 max-h-40 overflow-y-auto">
-                    {% for alb in albums %}
-                    <option value="{{ alb }}" {% if alb in selected_album %}selected{% endif %}>
-                        {{ alb }}
-                    </option>
-                    {% endfor %}
-                </select>
-                </div>
-
-                <!-- Plays mínimos -->
-                <div>
-                <label class="block text-sm text-white/70 mb-1">Plays mínimos</label>
-                <input type="number" name="min_plays"
-                    value="{{ min_plays or '' }}"
+                <label class="block text-sm text-white/70 mb-1">Reproduções mínimas</label>
+                <input type="number" name="table_min_plays"
+                    value="{{ table_min_plays or '' }}"
                     class="bg-gray-900 text-white px-3 py-2 rounded-lg border border-white/10"
                     placeholder="Ex: 1000000">
                 </div>
@@ -88,8 +171,8 @@
                 <!-- Ano mínimo -->
                 <div>
                 <label class="block text-sm text-white/70 mb-1">Ano mínimo</label>
-                <input type="number" name="min_year"
-                    value="{{ min_year or '' }}"
+                <input type="number" name="table_min_year"
+                    value="{{ table_min_year or '' }}"
                     class="bg-gray-900 text-white px-3 py-2 rounded-lg border border-white/10"
                     placeholder="Ex: 2010">
                 </div>
@@ -97,29 +180,208 @@
                 <!-- Ano máximo -->
                 <div>
                 <label class="block text-sm text-white/70 mb-1">Ano máximo</label>
-                <input type="number" name="max_year"
-                    value="{{ max_year or '' }}"
+                <input type="number" name="table_max_year"
+                    value="{{ table_max_year or '' }}"
                     class="bg-gray-900 text-white px-3 py-2 rounded-lg border border-white/10"
                     placeholder="Ex: 2023">
                 </div>
 
+                <!-- Preserve graph filters -->
+                {% if graph_min_plays %}
+                <input type="hidden" name="graph_min_plays" value="{{ graph_min_plays }}">
+                {% endif %}
+                {% if graph_min_year %}
+                <input type="hidden" name="graph_min_year" value="{{ graph_min_year }}">
+                {% endif %}
+                {% if graph_max_year %}
+                <input type="hidden" name="graph_max_year" value="{{ graph_max_year }}">
+                {% endif %}
+                {% if graph_top_artists %}
+                <input type="hidden" name="graph_top_artists" value="{{ graph_top_artists }}">
+                {% endif %}
+
                 <!-- Botão -->
                 <button type="submit"
                 class="px-5 py-2 rounded-lg bg-primary text-black font-semibold hover:opacity-80 transition">
-                Filtrar
+                Filtrar Tabela
                 </button>
 
             </form>
 
-            <!-- TABELA -->
-            {{ table|safe }}
-        </section>
+            <!-- SEARCH FILTER -->
+            <div class="mb-4 flex gap-3">
+                <input type="text" id="searchInput" onkeyup="filterTable()" 
+                    placeholder="Pesquisar na tabela..." 
+                    class="flex-1 bg-gray-900 text-white px-4 py-3 rounded-lg border border-white/10 focus:border-primary focus:outline-none">
+                <button onclick="clearAllFilters()" type="button"
+                    class="px-5 py-3 rounded-lg bg-gray-700 text-white font-semibold hover:bg-gray-600 transition flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    Limpar Filtros
+                </button>
+            </div>
 
-        <section>
-          <h3 class="text-xl font-semibold text-white/90 mb-4">Gráfico</h3>
-          {{ graph|safe }}
+            <!-- TABELA -->
+            <div id="tableContainer" class="overflow-y-auto" style="max-height: 400px;">
+                {{ table|safe }}
+            </div>
         </section>
       </div>
     </div>
+
+    <script>
+        let sortDirections = {}; // Guardar direção de ordenação para cada coluna
+
+        // Filtro geral da tabela (barra de pesquisa)
+        function filterTable() {
+            var input, filter, table, tr, td, i, j, txtValue, found;
+            input = document.getElementById("searchInput");
+            filter = input.value.toUpperCase();
+            table = document.querySelector("#tableContainer table");
+            
+            if (!table) return;
+            
+            tr = table.getElementsByTagName("tr");
+            
+            // Percorrer todas as linhas da tabela (saltar o cabeçalho)
+            for (i = 1; i < tr.length; i++) {
+                found = false;
+                td = tr[i].getElementsByTagName("td");
+                
+                // Percorrer todas as colunas da linha
+                for (j = 0; j < td.length; j++) {
+                    if (td[j]) {
+                        txtValue = td[j].textContent || td[j].innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                
+                // Mostrar ou esconder a linha baseado nos resultados
+                if (found) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+
+        // Mostrar/esconder dropdown de filtro por coluna
+        function toggleColumnFilter(colIndex) {
+            const dropdown = document.getElementById('filter-' + colIndex);
+            const allDropdowns = document.querySelectorAll('[id^="filter-"]');
+            
+            // Fechar todos os outros dropdowns
+            allDropdowns.forEach(d => {
+                if (d.id !== 'filter-' + colIndex) {
+                    d.classList.add('hidden');
+                }
+            });
+            
+            // Toggle o dropdown atual
+            dropdown.classList.toggle('hidden');
+            
+            // Se abriu, focar no input
+            if (!dropdown.classList.contains('hidden')) {
+                const input = dropdown.querySelector('input');
+                if (input) input.focus();
+            }
+        }
+
+        // Filtrar por coluna específica
+        function filterColumn(colIndex) {
+            const input = document.querySelector('#filter-' + colIndex + ' input');
+            const filter = input.value.toUpperCase();
+            const table = document.querySelector("#tableContainer table");
+            
+            if (!table) return;
+            
+            const tr = table.getElementsByTagName("tr");
+            
+            // Percorrer todas as linhas (saltar cabeçalho)
+            for (let i = 1; i < tr.length; i++) {
+                const td = tr[i].getElementsByTagName("td")[colIndex];
+                if (td) {
+                    const txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+        // Fechar dropdowns ao clicar fora
+        document.addEventListener('click', function(event) {
+            const isFilterButton = event.target.closest('button[onclick^="toggleColumnFilter"]');
+            const isFilterDropdown = event.target.closest('[id^="filter-"]');
+            
+            if (!isFilterButton && !isFilterDropdown) {
+                const allDropdowns = document.querySelectorAll('[id^="filter-"]');
+                allDropdowns.forEach(d => d.classList.add('hidden'));
+            }
+        });
+
+        // Ordenar tabela por coluna
+        function sortTable(colIndex) {
+            const table = document.querySelector("#tableContainer table");
+            if (!table) return;
+            
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            // Alternar direção de ordenação
+            sortDirections[colIndex] = sortDirections[colIndex] === 'asc' ? 'desc' : 'asc';
+            const direction = sortDirections[colIndex];
+            
+            // Ordenar linhas
+            rows.sort((a, b) => {
+                const aValue = a.getElementsByTagName('td')[colIndex].textContent.trim();
+                const bValue = b.getElementsByTagName('td')[colIndex].textContent.trim();
+                
+                // Tentar converter para número se possível
+                const aNum = parseFloat(aValue.replace(',', '.'));
+                const bNum = parseFloat(bValue.replace(',', '.'));
+                
+                let comparison = 0;
+                if (!isNaN(aNum) && !isNaN(bNum)) {
+                    comparison = aNum - bNum;
+                } else {
+                    comparison = aValue.localeCompare(bValue, 'pt-PT');
+                }
+                
+                return direction === 'asc' ? comparison : -comparison;
+            });
+            
+            // Reordenar DOM
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        // Limpar todos os filtros
+        function clearAllFilters() {
+            // Limpar pesquisa geral
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) searchInput.value = '';
+            
+            // Limpar todos os filtros de coluna
+            const columnFilters = document.querySelectorAll('[id^="filter-"] input');
+            columnFilters.forEach(input => input.value = '');
+            
+            // Mostrar todas as linhas
+            const table = document.querySelector("#tableContainer table");
+            if (table) {
+                const rows = table.querySelectorAll('tbody tr');
+                rows.forEach(row => row.style.display = '');
+            }
+            
+            // Fechar todos os dropdowns
+            const allDropdowns = document.querySelectorAll('[id^="filter-"]');
+            allDropdowns.forEach(d => d.classList.add('hidden'));
+        }
+    </script>
 </body>
 </html>

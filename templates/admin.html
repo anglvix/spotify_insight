@@ -45,6 +45,13 @@
       </form>
     </div>
 
+    <!-- SEARCH FILTER -->
+    <div class="mb-4">
+        <input type="text" id="searchInput" onkeyup="filterTable()" 
+            placeholder="Pesquisar utilizadores..." 
+            class="w-full bg-gray-900 text-white px-4 py-3 rounded-lg border border-white/10 focus:border-primary focus:outline-none">
+    </div>
+
     <div class="bg-gray-900 rounded-lg shadow overflow-hidden">
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-700">
@@ -96,5 +103,43 @@
       </div>
     </div>
   </div>
+
+  <script>
+    function filterTable() {
+        // Declare variables
+        var input, filter, table, tr, td, i, j, txtValue, found;
+        input = document.getElementById("searchInput");
+        filter = input.value.toUpperCase();
+        table = document.querySelector("table");
+        
+        if (!table) return;
+        
+        tr = table.getElementsByTagName("tr");
+        
+        // Loop through all table rows (skip the header)
+        for (i = 1; i < tr.length; i++) {
+            found = false;
+            td = tr[i].getElementsByTagName("td");
+            
+            // Loop through all columns in the row (excluding the last actions column)
+            for (j = 0; j < td.length - 1; j++) {
+                if (td[j]) {
+                    txtValue = td[j].textContent || td[j].innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            
+            // Show or hide the row based on search results
+            if (found) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+  </script>
 </body>
 </html>

@@ -37,14 +37,20 @@
 
 <header>{% include 'navbar.html' %}</header>
 
-<body>
+<body class="min-h-screen flex flex-col">
 
       <!-- Hero Section -->
-  <section class="pt-32 pb-20 hero-gradient">
+  <section class="flex-1 flex items-center justify-center hero-gradient">
     <div class="container mx-auto px-6 text-center">
+      {% if is_logged_in %}
+      <button onclick="location.href='/dashboard'" class="mb-8 px-6 py-3 rounded-full bg-white/10 backdrop-blur border border-white/20 text-primary hover:bg-white/20 transition">
+        Explora as tuas estatísticas
+      </button>
+      {% else %}
       <button onclick="location.href='/login'" class="mb-8 px-6 py-3 rounded-full bg-white/10 backdrop-blur border border-white/20 text-primary hover:bg-white/20 transition">
         Explora as tuas estatísticas
       </button>
+      {% endif %}
       <h2 class="text-6xl font-bold mb-6">
         Descobre a tua <span class="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">História Musical</span>
       </h2>

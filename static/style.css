@@ -13,3 +13,24 @@ body {
     box-shadow: 0 20px 40px rgba(0,245,255,0.2);
 }
 .hero-full { min-height: calc(100vh - var(--header-h)); }
+
+/* Estilização da scrollbar */
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #00f5ff, #9d4edd);
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #00d4dd, #8938cc);
+}
