@@ -16,33 +16,63 @@ CHAT_FILE = os.path.join(DATASETS_DIR, "chat.csv")
 FAVOURITES_FILE = os.path.join(DATASETS_DIR, "favourites.csv")
 
 def require_auth():
-    """Redireciona para login se o utilizador não estiver autenticado."""
+    """
+    Verifica se o utilizador está autenticado.
+    - Verifica se existe a chave 'user' na sessão.
+    - Se não estiver autenticado, retorna um redirect para a página de login.
+    - Se estiver autenticado, retorna None permitindo que a função continue.
+    Utilizado como função auxiliar em todas as rotas que requerem autenticação.
+    """
     if "user" not in session:
         return redirect("/login")
     return None
 
 def require_admin():
-    """Verifica se o utilizador é administrador."""
+    """
+    Verifica se o utilizador tem permissões de administrador.
+    - Verifica se o campo 'role' na sessão é igual a 'admin'.
+    - Se não for administrador, retorna mensagem de erro com código HTTP 403.
+    - Se for administrador, retorna None permitindo acesso à funcionalidade.
+    Utilizado em todas as rotas do painel de administração.
+    """
     if session.get("role") != "admin":
         return "Acesso negado", 403
     return None
 
 def read_csv(filepath):
-    """Lê um ficheiro CSV e retorna uma lista de dicionários."""
+    """
+    Lê um ficheiro CSV e retorna o conteúdo como lista de dicionários.
+    - Cada linha do CSV é convertida num dicionário com as chaves sendo os cabeçalhos.
+    - Se o ficheiro não existir, retorna uma lista vazia.
+    - Utiliza codificação UTF-8 para suportar caracteres especiais.
+    Função genérica reutilizável para ler qualquer ficheiro CSV do projecto.
+    """
     if not os.path.exists(filepath):
         return []
     with open(filepath, newline="", encoding="utf-8") as f:
         return list(csv.DictReader(f))
 
 def write_csv(filepath, headers, rows):
-    """Escreve dados num ficheiro CSV."""
+    """
+    Escreve dados num ficheiro CSV, sobrescrevendo o conteúdo existente.
+    - Recebe o caminho do ficheiro, lista de cabeçalhos e lista de linhas.
+    - Escreve primeiro a linha de cabeçalhos, depois todas as linhas de dados.
+    - Utiliza modo 'w' que apaga conteúdo anterior e cria ficheiro novo.
+    Utilizado para actualizar ficheiros CSV após modificações (ex: gestão de utilizadores).
+    """
     with open(filepath, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow(headers)
         writer.writerows(rows)
 
 def append_csv(filepath, headers, row):
-    """Adiciona uma linha a um ficheiro CSV."""
+    """
+    Adiciona uma nova linha ao final de um ficheiro CSV.
+    - Se o ficheiro não existir, cria-o e escreve primeiro os cabeçalhos.
+    - Se o ficheiro já existir, adiciona apenas a nova linha sem alterar dados existentes.
+    - Utiliza modo 'a' (append) para preservar conteúdo anterior.
+    Utilizado para adicionar novos registos (utilizadores, mensagens, favoritos).
+    """
     file_exists = os.path.exists(filepath)
     with open(filepath, "a", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
@@ -51,7 +81,14 @@ def append_csv(filepath, headers, row):
         writer.writerow(row)
 
 def format_number(num, is_decimal=False):
-    """Formata números para exibição (K para milhares, M para milhões)."""
+    """
+    Formata números grandes para formato legível com abreviações.
+    - Números >= 1.000.000 são convertidos para formato 'XM' (milhões).
+    - Números >= 1.000 são convertidos para formato 'XK' (milhares).
+    - Números menores são apresentados como inteiros ou com 2 casas decimais.
+    - Parâmetro is_decimal define se mostra casas decimais para números pequenos.
+    Utilizado nas estatísticas do dashboard para melhor visualização.
+    """
     if num >= 1000000:
         return f"{int(num/1000000)}M"
     elif num >= 1000:
@@ -59,7 +96,15 @@ def format_number(num, is_decimal=False):
     return f"{num:.2f}" if is_decimal else str(int(num))
 
 def apply_filters(df, min_plays=None, min_year=None, max_year=None):
-    """Aplica filtros de reproduções e anos ao dataframe."""
+    """
+    Aplica filtros de reproduções e anos a um DataFrame do pandas.
+    - min_plays: filtra músicas com número de reproduções >= valor especificado.
+    - min_year: filtra músicas com ano >= valor especificado.
+    - max_year: filtra músicas com ano <= valor especificado.
+    - Trata erros de conversão de tipo silenciosamente (ignora filtros inválidos).
+    - Retorna o DataFrame filtrado ou original se filtros forem inválidos.
+    Reutilizado tanto para filtrar tabela como gráficos no dashboard.
+    """
     if min_plays:
         try:
             df = df[df["play_count"] >= int(min_plays)]
@@ -78,16 +123,34 @@ def apply_filters(df, min_plays=None, min_year=None, max_year=None):
     return df
 
 def read_users():
-    """Lê o ficheiro CSV de utilizadores e retorna uma lista de dicionários."""
+    """
+    Lê o ficheiro CSV de utilizadores e retorna uma lista de dicionários.
+    Cada dicionário representa um utilizador com as chaves: id, nome, email, password, role.
+    Se o ficheiro não existir, retorna uma lista vazia.
+    Função específica que utiliza read_csv() para ler o ficheiro users.csv.
+    """
     return read_csv(USERS_FILE)
 
 def add_user(nome, email, password, role="user"):
-    """Adiciona um novo utilizador ao ficheiro CSV."""
+    """
+    Adiciona um novo utilizador ao ficheiro CSV.
+    - Gera automaticamente um ID incremental baseado no número de utilizadores existentes.
+    - O parâmetro role é opcional e tem valor padrão 'user'.
+    - Pode ser definido como 'admin' para criar administradores.
+    - Escreve os cabeçalhos automaticamente se o ficheiro não existir.
+    Nota: As passwords são guardadas em texto simples (não recomendado para produção).
+    """
     new_id = len(read_users()) + 1
     append_csv(USERS_FILE, ["id","nome","email","password","role"], [new_id, nome, email, password, role])
 
 def write_users(users_list):
-    """Sobrescreve o ficheiro de utilizadores com a lista fornecida."""
+    """
+    Sobrescreve completamente o ficheiro de utilizadores com a lista fornecida.
+    - Recebe uma lista de dicionários com as chaves: id, nome, email, password, role.
+    - Converte cada dicionário numa linha do CSV.
+    - Utiliza valores padrão para campos opcionais (password vazio, role 'user').
+    Utilizado no painel de administração para persistir alterações após promover/rebaixar/apagar utilizadores.
+    """
     rows = [[u['id'], u['nome'], u['email'], u.get('password',''), u.get('role','user')] for u in users_list]
     write_csv(USERS_FILE, ['id','nome','email','password','role'], rows)
 
@@ -97,13 +160,26 @@ def write_users(users_list):
 @app.route("/", methods=["GET"])
 @app.route("/home", methods=["GET"])
 def home():
-    """Página de landing pública."""
+    """
+    Página de landing pública.
+    - Acessível mesmo quando o utilizador está autenticado.
+    - Apresenta a página inicial do website com informações sobre o projecto.
+    - Passa informação se o utilizador está autenticado para adaptar a navegação.
+    Responde tanto à rota raiz '/' como à rota '/home'.
+    """
     is_logged_in = 'user' in session and 'role' in session
     return render_template("landingpage.html", is_logged_in=is_logged_in)
 
 @app.route("/login", methods=["GET","POST"])
 def login():
-    """Rota de autenticação. Valida credenciais e inicia sessão."""
+    """
+    Rota de autenticação de utilizadores.
+    - GET: apresenta o formulário de login.
+    - POST: valida credenciais (email e password) contra os utilizadores no CSV.
+    - Em caso de sucesso, guarda 'user' (nome) e 'role' na sessão.
+    - Redireciona para o dashboard após login bem-sucedido.
+    - Retorna mensagem de erro se credenciais forem inválidas.
+    """
     if request.method == "POST":
         email = request.form.get("email")
         password = request.form.get("password")
@@ -117,7 +193,15 @@ def login():
 
 @app.route("/register", methods=["GET","POST"])
 def register():
-    """Registo de novos utilizadores. Valida email único."""
+    """
+    Rota de registo de novos utilizadores.
+    - GET: apresenta o formulário de registo.
+    - POST: valida se o email já está registado.
+    - Se o email for único, cria novo utilizador com role 'user' por defeito.
+    - Redireciona para a página de login após registo bem-sucedido.
+    - Retorna mensagem de erro se o email já existir.
+    Página pública acessível sem autenticação.
+    """
     if request.method == "POST":
         nome = request.form.get("nome")
         email = request.form.get("email")
@@ -130,7 +214,17 @@ def register():
 
 @app.route("/dashboard")
 def dashboard():
-    """Dashboard principal com estatísticas, gráficos e tabela de músicas."""
+    """
+    Página principal do utilizador autenticado (Dashboard).
+    - Requer autenticação obrigatória.
+    - Lê o dataset do Spotify (spotify.csv) e apresenta estatísticas e gráficos.
+    - Suporta filtros independentes para tabela e gráficos (reproduções, anos).
+    - Gera tabela HTML interactiva com botões de favoritos, ordenação e filtros.
+    - Cria gráfico de pizza dos top 5 géneros musicais.
+    - Cria gráfico de barras dos top N artistas (configurável).
+    - Calcula estatísticas: total de reproduções, minutos, músicas, artistas e álbuns.
+    - Identifica músicas favoritas do utilizador para indicar na tabela.
+    """
     auth_check = require_auth()
     if auth_check:
         return auth_check
@@ -175,7 +269,16 @@ def dashboard():
                          graph_top_artists=graph_top_artists)
 
 def build_table_html(df, user_favourite_songs):
-    """Constrói a tabela HTML com favoritos e filtros."""
+    """
+    Constrói a tabela HTML completa com funcionalidades interactivas.
+    - Recebe um DataFrame com dados das músicas e conjunto de favoritos do utilizador.
+    - Cria cabeçalhos com ícones de ordenação para todas as colunas.
+    - Adiciona filtros por coluna (excepto Duração e Reproduções).
+    - Primeira coluna mostra botão de favorito (coração).
+    - Botões ficam desactivados (opacidade reduzida) se música já for favorita.
+    - Utiliza classes Tailwind CSS para estilização consistente.
+    - Retorna HTML completo pronto para inserir no template.
+    """
     no_filter_columns = ['Duração (min)', 'Reproduções']
     table_html = '<table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-800"><tr>'
     table_html += '<th class="px-3 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider w-20">Favorito</th>'
@@ -220,7 +323,17 @@ def build_table_html(df, user_favourite_songs):
     return f'<div class="overflow-x-auto"><div class="align-middle inline-block min-w-full shadow overflow-hidden sm:rounded-lg">{table_html}</div></div>'
 
 def calculate_stats(df):
-    """Calcula estatísticas do dataset."""
+    """
+    Calcula estatísticas a partir do DataFrame de músicas.
+    - Total de reproduções: soma de todos os play_count.
+    - Total de minutos: (duração de cada música * reproduções) convertido para minutos.
+    - Total de músicas: número de linhas no DataFrame.
+    - Total de artistas: contagem de artistas únicos.
+    - Total de álbuns: contagem de álbuns únicos.
+    - Top 5 géneros: ordena géneros por reproduções e selecciona os 5 primeiros.
+    - Formata números grandes com abreviações (K, M) para melhor visualização.
+    Retorna dicionário com todas as estatísticas formatadas.
+    """
     total_streams = df['play_count'].sum() if 'play_count' in df.columns else 0
     total_duration_ms = (df['duration_ms'] * df['play_count']).sum() if 'duration_ms' in df.columns and 'play_count' in df.columns else 0
     
@@ -239,7 +352,16 @@ def calculate_stats(df):
     }
 
 def create_genre_chart(df):
-    """Cria gráfico de pizza dos top 5 géneros."""
+    """
+    Cria gráfico de pizza (pie chart) dos top 5 géneros musicais.
+    - Agrupa dados por género e soma as reproduções.
+    - Ordena por reproduções decrescentes e selecciona os 5 primeiros.
+    - Utiliza paleta de cores verde-azul (#34D399 → #3B82F6) do tema do site.
+    - Configura tema escuro do Plotly para combinar com o design.
+    - Remove legenda e mostra percentagens dentro das fatias.
+    - Retorna HTML do gráfico pronto para inserir no template.
+    - Retorna string vazia se não houver dados ou colunas necessárias.
+    """
     if 'genre' not in df.columns or 'play_count' not in df.columns:
         return ""
     
@@ -260,7 +382,17 @@ def create_genre_chart(df):
     return fig.to_html(full_html=False, include_plotlyjs='cdn')
 
 def create_artist_chart(df, graph_top_artists):
-    """Cria gráfico de barras dos top artistas."""
+    """
+    Cria gráfico de barras dos top N artistas mais ouvidos.
+    - Agrupa dados por artista e soma as reproduções.
+    - Ordena por reproduções decrescentes e selecciona os N primeiros.
+    - O número de artistas (N) é configurável entre 1 e 50.
+    - Utiliza escala de cores do verde ao azul para colorir barras.
+    - Configura tema escuro com fundo transparente.
+    - Inclui hover interactivo mostrando nome e reproduções.
+    - Rótulos do eixo X inclinados a 45° para melhor legibilidade.
+    - Retorna HTML do gráfico ou mensagem de erro se colunas não existirem.
+    """
     if "artist" not in df.columns or "play_count" not in df.columns:
         return "<p>CSV não tem colunas 'artist' e 'play_count'</p>"
     
@@ -286,7 +418,15 @@ def create_artist_chart(df, graph_top_artists):
 
 @app.route("/admin")
 def admin():
-    """Página de administração."""
+    """
+    Página de administração do sistema.
+    - Requer permissões de administrador (role = 'admin').
+    - Lista todos os utilizadores registados no sistema.
+    - Permite promover utilizadores a administrador.
+    - Permite rebaixar administradores a utilizadores comuns.
+    - Permite apagar utilizadores (com restrições de segurança).
+    - Permite criar novos utilizadores directamente.
+    """
     admin_check = require_admin()
     if admin_check:
         return admin_check
@@ -294,7 +434,13 @@ def admin():
 
 @app.route("/admin/promote/<user_id>", methods=["POST"])
 def admin_promote(user_id):
-    """Promove um utilizador para administrador."""
+    """
+    Promove um utilizador comum para administrador.
+    - Requer permissões de administrador.
+    - Altera o campo 'role' do utilizador para 'admin'.
+    - Actualiza o ficheiro CSV com a alteração.
+    - Redireciona de volta para o painel de administração.
+    """
     admin_check = require_admin()
     if admin_check:
         return admin_check
@@ -308,7 +454,14 @@ def admin_promote(user_id):
 
 @app.route("/admin/demote/<user_id>", methods=["POST"])
 def admin_demote(user_id):
-    """Rebaixa um administrador para utilizador comum."""
+    """
+    Rebaixa um administrador para utilizador comum.
+    - Requer permissões de administrador.
+    - Altera o campo 'role' de 'admin' para 'user'.
+    - Verifica se não é o último administrador do sistema.
+    - Impede remoção do último admin para manter acesso ao painel.
+    - Actualiza o ficheiro CSV e redireciona para o painel.
+    """
     admin_check = require_admin()
     if admin_check:
         return admin_check
@@ -326,7 +479,14 @@ def admin_demote(user_id):
 
 @app.route("/admin/delete/<user_id>", methods=["POST"])
 def admin_delete(user_id):
-    """Apaga um utilizador."""
+    """
+    Apaga um utilizador do sistema.
+    - Requer permissões de administrador.
+    - Impede que o administrador apague a própria conta.
+    - Impede apagar o último administrador do sistema.
+    - Remove o utilizador da lista e actualiza o ficheiro CSV.
+    - Redireciona para o painel após eliminação bem-sucedida.
+    """
     admin_check = require_admin()
     if admin_check:
         return admin_check
@@ -345,7 +505,15 @@ def admin_delete(user_id):
 
 @app.route("/admin/create", methods=["POST"])
 def admin_create():
-    """Cria um novo utilizador via painel de administração."""
+    """
+    Cria um novo utilizador via painel de administração.
+    - Requer permissões de administrador.
+    - Valida que o email é único no sistema.
+    - Permite escolher a role (user ou admin) para o novo utilizador.
+    - Adiciona o utilizador ao ficheiro CSV.
+    - Retorna erro se o email já estiver registado.
+    - Redireciona para o painel após criação bem-sucedida.
+    """
     admin_check = require_admin()
     if admin_check:
         return admin_check
@@ -362,7 +530,14 @@ def admin_create():
 
 @app.route("/chat")
 def chat():
-    """Página de chat."""
+    """
+    Página de chat para utilizadores autenticados.
+    - Requer autenticação obrigatória.
+    - Lê todas as mensagens guardadas no ficheiro chat.csv.
+    - Apresenta mensagens com nome do utilizador, hora e conteúdo.
+    - Destaca mensagens do administrador com cor diferente.
+    - Permite aos utilizadores enviar novas mensagens.
+    """
     auth_check = require_auth()
     if auth_check:
         return auth_check
@@ -370,7 +545,15 @@ def chat():
 
 @app.route("/chat/send", methods=["POST"])
 def chat_send():
-    """Envia uma nova mensagem para o chat."""
+    """
+    Envia uma nova mensagem para o chat.
+    - Requer autenticação obrigatória.
+    - Recebe a mensagem do formulário.
+    - Gera ID único incremental para a mensagem.
+    - Regista timestamp actual no formato 'AAAA-MM-DD HH:MM:SS'.
+    - Guarda mensagem no ficheiro chat.csv com: id, user, time, message.
+    - Redireciona de volta para a página do chat.
+    """
     auth_check = require_auth()
     if auth_check:
         return auth_check
@@ -386,7 +569,15 @@ def chat_send():
 
 @app.route("/favourites")
 def favourites():
-    """Página de favoritos com filtros opcionais."""
+    """
+    Página de gestão de músicas favoritas.
+    - Requer autenticação obrigatória.
+    - Lista apenas os favoritos do utilizador actual.
+    - Enriquece dados com informações do spotify.csv (artista, álbum, ano, etc).
+    - Suporta filtros opcionais: reproduções mínimas, ano mínimo e máximo.
+    - Apresenta tabela formatada com botão de remover para cada favorito.
+    - Mostra mensagem se não houver favoritos guardados.
+    """
     auth_check = require_auth()
     if auth_check:
         return auth_check
@@ -432,7 +623,15 @@ def favourites():
 
 @app.route("/favourites/add", methods=["POST"])
 def favourites_add():
-    """Adiciona uma música aos favoritos."""
+    """
+    Adiciona uma música aos favoritos do utilizador.
+    - Requer autenticação obrigatória.
+    - Recebe o nome da música do formulário.
+    - Gera ID único incremental.
+    - Guarda no ficheiro favourites.csv com: id, user, song.
+    - Redireciona para a página de favoritos.
+    Chamado pelos botões de coração na tabela do dashboard.
+    """
     auth_check = require_auth()
     if auth_check:
         return auth_check
@@ -445,7 +644,15 @@ def favourites_add():
 
 @app.route("/favourites/remove/<fav_id>", methods=["POST"])
 def favourites_remove(fav_id):
-    """Remove uma música dos favoritos."""
+    """
+    Remove uma música dos favoritos.
+    - Requer autenticação obrigatória.
+    - Apenas o dono do favorito pode removê-lo (verificação de segurança).
+    - Lê todos os favoritos, filtra removendo apenas o especificado.
+    - Reescreve o ficheiro CSV sem o favorito removido.
+    - Redireciona de volta para a página de favoritos.
+    Chamado pelos botões 'Remover' na tabela de favoritos.
+    """
     auth_check = require_auth()
     if auth_check:
         return auth_check
@@ -458,7 +665,12 @@ def favourites_remove(fav_id):
 
 @app.route("/logout")
 def logout():
-    """Limpa a sessão do utilizador (logout)."""
+    """
+    Termina a sessão do utilizador (logout).
+    - Limpa todos os dados da sessão (nome e role).
+    - Redireciona para a página de login.
+    - Após logout, o utilizador precisa autenticar-se novamente.
+    """
     session.clear()
     return redirect("/login")
 
