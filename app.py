@@ -11,8 +11,8 @@ app.secret_key = "segredo_simples"
 # Caminhos
 # -------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-USERS_FILE = os.path.join(BASE_DIR, "users.csv")
 DATASETS_DIR = os.path.join(BASE_DIR, "datasets")
+USERS_FILE = os.path.join(DATASETS_DIR, "users.csv")
 SPOTIFY_CSV = os.path.join(DATASETS_DIR, "spotify.csv")  # o teu dataset
 
 # -------------------------
