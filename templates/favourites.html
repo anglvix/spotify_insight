@@ -19,82 +19,121 @@
             </h1>
             
             <!-- Conteúdo dos Favoritos -->
-            <div class="bg-gray-900/50 backdrop-blur-md rounded-2xl shadow-2xl border border-white/10 overflow-hidden">
-                {% if favourites %}
-                <div class="overflow-x-auto">
-                    <div class="align-middle inline-block min-w-full shadow overflow-hidden sm:rounded-lg">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-800">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        #
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        Música
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        Artista
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        Álbum
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        Ano
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        Reproduções
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        Duração (min)
-                                    </th>
-                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        Ações
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-gray-900 divide-y divide-gray-700">
-                                {% for fav in favourites %}
-                                <tr class="hover:bg-gray-800 transition">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                                        {{ loop.index }}
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-gray-300">
-                                        <div class="flex items-center gap-2">
-                                            <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                            </svg>
-                                            <span>{{ fav.song }}</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                                        {{ fav.artist }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                                        {{ fav.album }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                                        {{ fav.year }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                                        {{ fav.play_count }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                                        {{ fav.duration_min }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
-                                        <form method="POST" action="/favourites/remove/{{ fav.id }}" class="inline">
-                                            <button type="submit" class="text-red-400 hover:text-red-300 transition font-medium">
-                                                Remover
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+            {% if favourites %}
+            <!-- FILTROS -->
+            <form method="get" class="mb-6 flex flex-wrap gap-4 items-end">
+                <!-- Reproduções mínimas -->
+                <div>
+                    <label class="block text-sm text-white/70 mb-1">Reproduções mínimas</label>
+                    <input type="number" name="min_plays"
+                        value="{{ min_plays or '' }}"
+                        class="bg-gray-900 text-white px-3 py-2 rounded-lg border border-white/10"
+                        placeholder="Ex: 1000000">
                 </div>
-                {% else %}
+
+                <!-- Ano mínimo -->
+                <div>
+                    <label class="block text-sm text-white/70 mb-1">Ano mínimo</label>
+                    <input type="number" name="min_year"
+                        value="{{ min_year or '' }}"
+                        class="bg-gray-900 text-white px-3 py-2 rounded-lg border border-white/10"
+                        placeholder="Ex: 2010">
+                </div>
+
+                <!-- Ano máximo -->
+                <div>
+                    <label class="block text-sm text-white/70 mb-1">Ano máximo</label>
+                    <input type="number" name="max_year"
+                        value="{{ max_year or '' }}"
+                        class="bg-gray-900 text-white px-3 py-2 rounded-lg border border-white/10"
+                        placeholder="Ex: 2023">
+                </div>
+
+                <!-- Botão -->
+                <button type="submit"
+                    class="px-5 py-2 rounded-lg bg-gradient-to-r from-green-400 to-blue-500 text-black font-semibold hover:opacity-90 transition">
+                    Filtrar
+                </button>
+            </form>
+
+            <!-- SEARCH FILTER -->
+            <div class="mb-4 flex gap-3">
+                <input type="text" id="searchInput" onkeyup="filterTable()" 
+                    placeholder="Pesquisar na tabela..." 
+                    class="flex-1 bg-gray-900 text-white px-4 py-3 rounded-lg border border-white/10 focus:border-primary focus:outline-none">
+                <button onclick="clearAllFilters()" type="button"
+                    class="px-5 py-3 rounded-lg bg-gray-700 text-white font-semibold hover:bg-gray-600 transition flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    Limpar Filtros
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <div class="align-middle inline-block min-w-full shadow overflow-hidden sm:rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-800">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    Música
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    Artista
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    Álbum
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    Ano
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    Reproduções
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    Duração (min)
+                                </th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    Ações
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-gray-900 divide-y divide-gray-700">
+                            {% for fav in favourites %}
+                            <tr class="hover:bg-gray-800 transition">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                    {{ fav.song }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                    {{ fav.artist }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                    {{ fav.album }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                    {{ fav.year }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                    {{ fav.play_count }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                    {{ fav.duration_min }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
+                                    <form method="POST" action="/favourites/remove/{{ fav.id }}" class="inline">
+                                        <button type="submit" class="text-red-400 hover:text-red-300 transition font-medium">
+                                            Remover
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% else %}
+            <div class="bg-gray-900/50 backdrop-blur-md rounded-2xl shadow-2xl border border-white/10 overflow-hidden">
                 <div class="p-12 text-center">
                     <svg class="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
@@ -113,5 +152,59 @@
             </div>
         </div>
     </div>
+
+    <script>
+        let sortDirections = {}; // Guardar direção de ordenação para cada coluna
+
+        // Filtro geral da tabela (barra de pesquisa)
+        function filterTable() {
+            var input, filter, table, tr, td, i, j, txtValue, found;
+            input = document.getElementById("searchInput");
+            filter = input.value.toUpperCase();
+            table = document.querySelector("table");
+            
+            if (!table) return;
+            
+            tr = table.getElementsByTagName("tr");
+            
+            // Percorrer todas as linhas da tabela (saltar o cabeçalho)
+            for (i = 1; i < tr.length; i++) {
+                found = false;
+                td = tr[i].getElementsByTagName("td");
+                
+                // Percorrer todas as colunas da linha
+                for (j = 0; j < td.length; j++) {
+                    if (td[j]) {
+                        txtValue = td[j].textContent || td[j].innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                
+                // Mostrar ou esconder a linha baseado nos resultados
+                if (found) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+
+        // Limpar todos os filtros
+        function clearAllFilters() {
+            // Limpar pesquisa geral
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) searchInput.value = '';
+            
+            // Mostrar todas as linhas
+            const table = document.querySelector("table");
+            if (table) {
+                const rows = table.querySelectorAll('tbody tr');
+                rows.forEach(row => row.style.display = '');
+            }
+        }
+    </script>
 </body>
 </html>

@@ -142,6 +142,17 @@ def dashboard():
         return redirect("/login")
 
     # -------------------------
+    # Ler favoritos do utilizador
+    # -------------------------
+    user_favourite_songs = set()
+    if os.path.exists(FAVOURITES_FILE):
+        with open(FAVOURITES_FILE, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if row['user'] == session['user']:
+                    user_favourite_songs.add(row['song'])
+
+    # -------------------------
     # Ler CSV do Spotify com Pandas
     # -------------------------
     if not os.path.exists(SPOTIFY_CSV):
@@ -284,7 +295,20 @@ def dashboard():
         table_html += '<tr class="hover:bg-gray-800 transition">'
         song_name = row['Música'] if 'Música' in row else row.iloc[0]
         # Adicionar botão de favorito como primeira coluna
-        table_html += f'''
+        is_favourite = song_name in user_favourite_songs
+        
+        if is_favourite:
+            # Se já é favorito, mostrar coração preenchido e desabilitado
+            table_html += f'''
+        <td class="px-2 py-4 text-center w-20">
+            <span class="text-2xl inline-block opacity-50" title="Já nos favoritos">
+                ❤️
+            </span>
+        </td>
+            '''
+        else:
+            # Se não é favorito, mostrar botão para adicionar
+            table_html += f'''
         <td class="px-2 py-4 text-center w-20">
             <form method="POST" action="/favourites/add" class="inline">
                 <input type="hidden" name="song" value="{song_name}">
@@ -293,7 +317,7 @@ def dashboard():
                 </button>
             </form>
         </td>
-        '''
+            '''
         for val in row:
             table_html += f'<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{val}</td>'
         table_html += '</tr>'
@@ -306,9 +330,9 @@ def dashboard():
     # Calcular estatísticas a partir dos dados filtrados da tabela
     def format_number(num, is_decimal=False):
         if num >= 1000000:
-            return f"{num/1000000:.3f}M"
+            return f"{int(num/1000000)}M"
         elif num >= 1000:
-            return f"{num/1000:.3f}K"
+            return f"{int(num/1000)}K"
         else:
             if is_decimal:
                 return f"{num:.2f}"
@@ -327,6 +351,7 @@ def dashboard():
     
     # Calcular top géneros
     top_genres = []
+    genre_graph_html = ""
     if 'genre' in df_table.columns and 'play_count' in df_table.columns:
         genre_stats = df_table.groupby('genre')['play_count'].sum().reset_index()
         genre_stats = genre_stats.sort_values('play_count', ascending=False).head(5)
@@ -335,6 +360,35 @@ def dashboard():
                 'name': row['genre'],
                 'plays': format_number(row['play_count'])
             })
+        
+        # Criar gráfico circular (pie chart) para os top 5 géneros
+        if not genre_stats.empty:
+            primary = "#34D399"  # tailwind green-400
+            secondary = "#3B82F6"  # tailwind blue-500
+            colors = ['#34D399', '#22C55E', '#10B981', '#2563EB', '#3B82F6']
+            
+            fig_genre = px.pie(
+                genre_stats,
+                values='play_count',
+                names='genre',
+                color_discrete_sequence=colors,
+                template="plotly_dark"
+            )
+            fig_genre.update_traces(
+                textposition='inside',
+                textinfo='percent+label',
+                textfont=dict(size=18, family="Inter, sans-serif", color="#ffffff"),
+                hovertemplate="<b>%{label}</b><br>Reproduções: %{value}<extra></extra>",
+                marker=dict(line=dict(color='#000000', width=2))
+            )
+            fig_genre.update_layout(
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
+                font=dict(family="Inter, sans-serif", color="#e0e0e0", size=16),
+                margin=dict(l=20, r=20, t=20, b=20),
+                showlegend=False
+            )
+            genre_graph_html = fig_genre.to_html(full_html=False, include_plotlyjs='cdn')
     
     stats = {
         'total_streams': format_number(total_streams),
@@ -388,7 +442,8 @@ def dashboard():
         "dashboard.html", 
         user=session["user"], 
         table=table_html, 
-        graph=graph_html, 
+        graph=graph_html,
+        genre_graph=genre_graph_html,
         stats=stats,
         table_min_plays=table_min_plays, 
         table_min_year=table_min_year, 
@@ -563,9 +618,15 @@ def favourites():
     - Requer autenticação (verifica se o utilizador está na sessão).
     - Mostra apenas os favoritos do utilizador logado.
     - Busca informações detalhadas de cada música no spotify.csv.
+    - Suporta filtros de reproduções mínimas e intervalo de anos.
     """
     if "user" not in session:
         return redirect("/login")
+    
+    # Obter filtros do formulário
+    min_plays = request.args.get('min_plays', type=int)
+    min_year = request.args.get('min_year', type=int)
+    max_year = request.args.get('max_year', type=int)
     
     user_favourites = []
     if os.path.exists(FAVOURITES_FILE):
@@ -588,6 +649,23 @@ def favourites():
             if not song_data.empty:
                 # Pegar a primeira ocorrência
                 song_info = song_data.iloc[0]
+                
+                # Aplicar filtros
+                play_count = song_info.get('play_count', 0)
+                year = song_info.get('year', 0)
+                
+                # Verificar filtro de reproduções mínimas
+                if min_plays and play_count < min_plays:
+                    continue
+                
+                # Verificar filtro de ano mínimo
+                if min_year and year < min_year:
+                    continue
+                
+                # Verificar filtro de ano máximo
+                if max_year and year > max_year:
+                    continue
+                
                 enriched_fav = {
                     'id': fav['id'],
                     'song': song_name,
@@ -600,7 +678,7 @@ def favourites():
                 }
                 enriched_favourites.append(enriched_fav)
             else:
-                # Caso a música não seja encontrada, adicionar só com o nome
+                # Caso a música não seja encontrada, adicionar só com o nome (sem filtros)
                 enriched_favourites.append({
                     'id': fav['id'],
                     'song': song_name,
@@ -612,7 +690,12 @@ def favourites():
                     'genre': 'N/A'
                 })
     
-    return render_template("favourites.html", user=session["user"], favourites=enriched_favourites)
+    return render_template("favourites.html", 
+                         user=session["user"], 
+                         favourites=enriched_favourites,
+                         min_plays=min_plays,
+                         min_year=min_year,
+                         max_year=max_year)
 
 @app.route("/favourites/add", methods=["POST"])
 def favourites_add():
