@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spotify Insight</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script>
+    <meta charset="UTF-8"> <!-- Codificação UTF-8 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsivo -->
+    <title>Spotify Insight</title> <!-- Título da página -->
+    <script src="https://cdn.tailwindcss.com"></script> <!-- Framework Tailwind -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> <!-- CSS personalizado -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"> <!-- Fontes Google -->
+    <script> <!-- Configuração Tailwind -->
         tailwind.config = {
             darkMode: 'class',
             theme: {
@@ -35,15 +35,15 @@
     </script>
 </head>
 
-<header>{% include 'navbar.html' %}</header>
+<header>{% include 'navbar.html' %}</header> <!-- Barra de navegação -->
 
 <body class="min-h-screen flex flex-col">
 
-      <!-- Hero Section -->
+      <!-- Secção hero principal -->
   <section class="flex-1 flex items-center justify-center hero-gradient">
-    <div class="container mx-auto px-6 text-center">
-      {% if is_logged_in %}
-      <button onclick="location.href='/dashboard'" class="mb-8 px-6 py-3 rounded-full bg-white/10 backdrop-blur border border-white/20 text-primary hover:bg-white/20 transition">
+    <div class="container mx-auto px-6 text-center"> <!-- Container centralizado -->
+      {% if is_logged_in %} <!-- Se utilizador está logado -->
+      <button onclick="location.href='/dashboard'" class="mb-8 px-6 py-3 rounded-full bg-white/10 backdrop-blur border border-white/20 text-primary hover:bg-white/20 transition"> <!-- Botão para dashboard -->
         Explora as tuas estatísticas
       </button>
       {% else %}
