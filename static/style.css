@@ -1,4 +1,3 @@
-
 body {
     background: linear-gradient(to bottom, #0a0a1a, #000000);
     color: #e0e0e0;
@@ -14,7 +13,6 @@ body {
 }
 .hero-full { min-height: calc(100vh - var(--header-h)); }
 
-/* Estilização da scrollbar */
 ::-webkit-scrollbar {
     width: 12px;
     height: 12px;
