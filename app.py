@@ -327,8 +327,12 @@ def dashboard():
     # Envolver numa caixa responsiva com sombra
     table_html = f'<div class="overflow-x-auto"><div class="align-middle inline-block min-w-full shadow overflow-hidden sm:rounded-lg">{table_html}</div></div>'
 
-    # Calcular estatísticas a partir dos dados filtrados da tabela
     def format_number(num, is_decimal=False):
+        """
+        Formata números para exibição nas estatísticas.
+        - Converte números grandes em formato abreviado (K para milhares, M para milhões).
+        - Retorna o número formatado como string sem casas decimais por defeito.
+        """
         if num >= 1000000:
             return f"{int(num/1000000)}M"
         elif num >= 1000:

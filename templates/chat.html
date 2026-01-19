@@ -18,9 +18,7 @@
                 Chat
             </h1>
             
-            <!-- Contentor do Chat -->
             <div class="bg-gray-900/50 backdrop-blur-md rounded-2xl shadow-2xl border border-white/10 overflow-hidden">
-                <!-- Área de Mensagens -->
                 <div id="messages-container" class="h-[700px] overflow-y-auto p-6 space-y-4">
                     {% if messages %}
                         {% for msg in messages %}
@@ -54,7 +52,6 @@
                     {% endif %}
                 </div>
                 
-                <!-- Entrada de Mensagem -->
                 <div class="bg-gray-800/50 border-t border-white/10 p-4">
                     <form method="POST" action="/chat/send" class="flex gap-3">
                         <input 
