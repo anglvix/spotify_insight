@@ -12,6 +12,10 @@
       <nav class="hidden md:flex gap-6">
         <a href="/home" class="text-white/90 hover:text-white transition">Home</a>
         <a href="/dashboard" class="text-white/80 hover:text-white transition">Dashboard</a>
+        {% if session.get('user') %}
+        <a href="/favourites" class="text-white/80 hover:text-white transition">Favoritos</a>
+        <a href="/chat" class="text-white/80 hover:text-white transition">Chat</a>
+        {% endif %}
         {% if session.get('role') == 'admin' %}
         <a href="/admin" id="admin-link" class="text-white/80 hover:text-white transition">Admin</a>
         {% endif %}
@@ -38,6 +42,8 @@
       <li><a href="/home" class="text-white/90">Home</a></li>
       <li><a href="/dashboard" class="text-white/80">Dashboard</a></li>
       {% if session.get('user') %}
+      <li><a href="/favourites" class="text-white/80">Favoritos</a></li>
+      <li><a href="/chat" class="text-white/80">Chat</a></li>
       <li><a href="/logout" class="text-white/80">Logout</a></li>
       {% else %}
       <li><a href="/login" class="text-white/80">Login</a></li>

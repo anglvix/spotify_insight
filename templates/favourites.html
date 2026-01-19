@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favoritos - Spotify Insight</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<header>{% include 'navbar.html' %}</header>
+
+<body class="bg-transparent">
+    <div class="container mx-auto px-6 pt-20">
+        <div class="max-w-6xl mx-auto">
+            <h1 class="text-4xl font-bold mb-8 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
+                As Minhas Músicas Favoritas
+            </h1>
+            
+            <!-- Conteúdo dos Favoritos -->
+            <div class="bg-gray-900/50 backdrop-blur-md rounded-2xl shadow-2xl border border-white/10 overflow-hidden">
+                {% if favourites %}
+                <div class="overflow-x-auto">
+                    <div class="align-middle inline-block min-w-full shadow overflow-hidden sm:rounded-lg">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-800">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                        #
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                        Música
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                        Artista
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                        Álbum
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                        Ano
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                        Reproduções
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                        Duração (min)
+                                    </th>
+                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                        Ações
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-gray-900 divide-y divide-gray-700">
+                                {% for fav in favourites %}
+                                <tr class="hover:bg-gray-800 transition">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                        {{ loop.index }}
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-300">
+                                        <div class="flex items-center gap-2">
+                                            <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                            </svg>
+                                            <span>{{ fav.song }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                        {{ fav.artist }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                        {{ fav.album }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                        {{ fav.year }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                        {{ fav.play_count }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                        {{ fav.duration_min }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
+                                        <form method="POST" action="/favourites/remove/{{ fav.id }}" class="inline">
+                                            <button type="submit" class="text-red-400 hover:text-red-300 transition font-medium">
+                                                Remover
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% else %}
+                <div class="p-12 text-center">
+                    <svg class="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+                    </svg>
+                    <p class="text-gray-500 text-lg">Ainda não tem músicas favoritas.</p>
+                    <p class="text-gray-600 text-sm mt-2">Adicione algumas músicas da página Dashboard!</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Botão para voltar ao Dashboard -->
+            <div class="mt-6">
+                <a href="/dashboard" class="inline-block px-6 py-3 rounded-lg bg-gradient-to-r from-green-400 to-blue-500 text-black font-semibold hover:opacity-90 transition">
+                    Voltar ao Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

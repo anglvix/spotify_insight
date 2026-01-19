@@ -26,11 +26,11 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #00f5ff, #9d4edd);
+    background: linear-gradient(180deg, #34D399, #3B82F6);
     border-radius: 10px;
     border: 2px solid rgba(255, 255, 255, 0.05);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, #00d4dd, #8938cc);
+    background: linear-gradient(180deg, #10B981, #2563EB);
 }

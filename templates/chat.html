@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat - Spotify Insight</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<header>{% include 'navbar.html' %}</header>
+
+<body class="bg-transparent">
+    <div class="container mx-auto px-6 pt-20">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-4xl font-bold mb-8 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
+                Chat
+            </h1>
+            
+            <!-- Contentor do Chat -->
+            <div class="bg-gray-900/50 backdrop-blur-md rounded-2xl shadow-2xl border border-white/10 overflow-hidden">
+                <!-- Área de Mensagens -->
+                <div id="messages-container" class="h-[700px] overflow-y-auto p-6 space-y-4">
+                    {% if messages %}
+                        {% for msg in messages %}
+                        <div class="flex flex-col">
+                            <div class="flex items-baseline gap-2 mb-1">
+                                {% if msg.user == 'Admin' %}
+                                <span class="font-bold text-yellow-400 flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    {{ msg.user }}
+                                </span>
+                                {% else %}
+                                <span class="font-semibold text-green-400">{{ msg.user }}</span>
+                                {% endif %}
+                                <span class="text-xs text-gray-500">{{ msg.time }}</span>
+                            </div>
+                            {% if msg.user == 'Admin' %}
+                            <div class="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-lg px-4 py-2 max-w-[80%] border-2 border-yellow-500/50 shadow-lg shadow-yellow-500/20">
+                                <p class="text-white font-medium">{{ msg.message }}</p>
+                            </div>
+                            {% else %}
+                            <div class="bg-gray-800/70 rounded-lg px-4 py-2 max-w-[80%] border border-white/5">
+                                <p class="text-gray-200">{{ msg.message }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-center text-gray-500">Sem mensagens ainda. Seja o primeiro a enviar uma!</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Entrada de Mensagem -->
+                <div class="bg-gray-800/50 border-t border-white/10 p-4">
+                    <form method="POST" action="/chat/send" class="flex gap-3">
+                        <input 
+                            type="text" 
+                            name="message" 
+                            required
+                            placeholder="Escreva a sua mensagem..."
+                            class="flex-1 bg-gray-900 text-white px-4 py-3 rounded-lg border border-white/10 focus:border-green-400 focus:outline-none transition"
+                        >
+                        <button 
+                            type="submit"
+                            class="px-6 py-3 rounded-lg bg-gradient-to-r from-green-400 to-blue-500 text-black font-semibold hover:opacity-90 transition"
+                        >
+                            Enviar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Scroll automático para o final ao carregar a página
+        const container = document.getElementById('messages-container');
+        if (container) {
+            container.scrollTop = container.scrollHeight;
+        }
+    </script>
+</body>
+</html>

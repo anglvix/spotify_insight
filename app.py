@@ -14,6 +14,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATASETS_DIR = os.path.join(BASE_DIR, "datasets")
 USERS_FILE = os.path.join(DATASETS_DIR, "users.csv")
 SPOTIFY_CSV = os.path.join(DATASETS_DIR, "spotify.csv")  # o teu dataset
+CHAT_FILE = os.path.join(DATASETS_DIR, "chat.csv")
+FAVOURITES_FILE = os.path.join(DATASETS_DIR, "favourites.csv")
 
 # -------------------------
 # Funções de utilizadores
@@ -228,6 +230,13 @@ def dashboard():
     # Criar tabela HTML personalizada com dropdowns nos cabeçalhos
     table_html = '<table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-800"><tr>'
     
+    # Adicionar coluna de favoritos como primeira coluna
+    table_html += '''
+        <th class="px-3 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider w-20">
+            Favorito
+        </th>
+    '''
+    
     # Criar cabeçalhos com ícone de filtro e ordenação
     for col_idx, col in enumerate(df_table_display.columns):
         # Verificar se esta coluna deve ter filtro
@@ -273,6 +282,18 @@ def dashboard():
     # Adicionar linhas
     for _, row in df_table_display.iterrows():
         table_html += '<tr class="hover:bg-gray-800 transition">'
+        song_name = row['Música'] if 'Música' in row else row.iloc[0]
+        # Adicionar botão de favorito como primeira coluna
+        table_html += f'''
+        <td class="px-2 py-4 text-center w-20">
+            <form method="POST" action="/favourites/add" class="inline">
+                <input type="hidden" name="song" value="{song_name}">
+                <button type="submit" class="text-2xl hover:scale-125 transition-transform duration-200 inline-block" title="Adicionar aos favoritos">
+                    ❤️
+                </button>
+            </form>
+        </td>
+        '''
         for val in row:
             table_html += f'<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{val}</td>'
         table_html += '</tr>'
@@ -476,6 +497,184 @@ def admin_create():
             return "Email já existe!", 400
     add_user(nome, email, password, role)
     return redirect("/admin")
+
+@app.route("/chat")
+def chat():
+    """
+    Página de chat.
+    - Requer autenticação (verifica se o utilizador está na sessão).
+    - Disponível apenas para utilizadores autenticados.
+    - Lê e apresenta todas as mensagens do ficheiro chat.csv.
+    """
+    if "user" not in session:
+        return redirect("/login")
+    
+    messages = []
+    if os.path.exists(CHAT_FILE):
+        with open(CHAT_FILE, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                messages.append(row)
+    
+    return render_template("chat.html", user=session["user"], messages=messages)
+
+@app.route("/chat/send", methods=["POST"])
+def chat_send():
+    """
+    Envia uma nova mensagem para o chat.
+    - Requer autenticação.
+    - Guarda a mensagem no ficheiro chat.csv com id, user, time e message.
+    - Redireciona de volta para a página de chat.
+    """
+    if "user" not in session:
+        return redirect("/login")
+    
+    message = request.form.get("message")
+    if not message:
+        return redirect("/chat")
+    
+    from datetime import datetime
+    
+    # Ler mensagens existentes para gerar novo id
+    messages = []
+    file_exists = os.path.exists(CHAT_FILE)
+    if file_exists:
+        with open(CHAT_FILE, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                messages.append(row)
+    
+    new_id = len(messages) + 1
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    # Escrever nova mensagem
+    with open(CHAT_FILE, "a", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        if not file_exists:
+            writer.writerow(["id", "user", "time", "message"])
+        writer.writerow([new_id, session["user"], current_time, message])
+    
+    return redirect("/chat")
+
+@app.route("/favourites")
+def favourites():
+    """
+    Página de favoritos.
+    - Requer autenticação (verifica se o utilizador está na sessão).
+    - Mostra apenas os favoritos do utilizador logado.
+    - Busca informações detalhadas de cada música no spotify.csv.
+    """
+    if "user" not in session:
+        return redirect("/login")
+    
+    user_favourites = []
+    if os.path.exists(FAVOURITES_FILE):
+        with open(FAVOURITES_FILE, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if row['user'] == session['user']:
+                    user_favourites.append(row)
+    
+    # Ler spotify.csv para obter informações detalhadas das músicas
+    enriched_favourites = []
+    if os.path.exists(SPOTIFY_CSV) and user_favourites:
+        df = pd.read_csv(SPOTIFY_CSV)
+        
+        for fav in user_favourites:
+            song_name = fav['song']
+            # Procurar a música no dataset
+            song_data = df[df['track_name'] == song_name]
+            
+            if not song_data.empty:
+                # Pegar a primeira ocorrência
+                song_info = song_data.iloc[0]
+                enriched_fav = {
+                    'id': fav['id'],
+                    'song': song_name,
+                    'artist': song_info.get('artist', 'N/A'),
+                    'album': song_info.get('album', 'N/A'),
+                    'year': song_info.get('year', 'N/A'),
+                    'play_count': song_info.get('play_count', 'N/A'),
+                    'duration_min': round(song_info.get('duration_ms', 0) / 60000, 2) if 'duration_ms' in song_info else 'N/A',
+                    'genre': song_info.get('genre', 'N/A')
+                }
+                enriched_favourites.append(enriched_fav)
+            else:
+                # Caso a música não seja encontrada, adicionar só com o nome
+                enriched_favourites.append({
+                    'id': fav['id'],
+                    'song': song_name,
+                    'artist': 'N/A',
+                    'album': 'N/A',
+                    'year': 'N/A',
+                    'play_count': 'N/A',
+                    'duration_min': 'N/A',
+                    'genre': 'N/A'
+                })
+    
+    return render_template("favourites.html", user=session["user"], favourites=enriched_favourites)
+
+@app.route("/favourites/add", methods=["POST"])
+def favourites_add():
+    """
+    Adiciona uma música aos favoritos do utilizador.
+    - Requer autenticação.
+    - Guarda no ficheiro favourites.csv com id, user e song.
+    """
+    if "user" not in session:
+        return redirect("/login")
+    
+    song = request.form.get("song")
+    if not song:
+        return redirect("/dashboard")
+    
+    # Ler favoritos existentes para gerar novo id
+    favourites = []
+    file_exists = os.path.exists(FAVOURITES_FILE)
+    if file_exists:
+        with open(FAVOURITES_FILE, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                favourites.append(row)
+    
+    new_id = len(favourites) + 1
+    
+    # Escrever novo favorito
+    with open(FAVOURITES_FILE, "a", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        if not file_exists:
+            writer.writerow(["id", "user", "song"])
+        writer.writerow([new_id, session["user"], song])
+    
+    return redirect("/favourites")
+
+@app.route("/favourites/remove/<fav_id>", methods=["POST"])
+def favourites_remove(fav_id):
+    """
+    Remove uma música dos favoritos.
+    - Apenas o dono do favorito pode removê-lo.
+    """
+    if "user" not in session:
+        return redirect("/login")
+    
+    favourites = []
+    if os.path.exists(FAVOURITES_FILE):
+        with open(FAVOURITES_FILE, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                # Manter apenas os favoritos que não correspondem ao id a remover
+                # ou que não pertencem ao utilizador atual (segurança)
+                if row['id'] != fav_id or row['user'] != session['user']:
+                    favourites.append(row)
+    
+    # Reescrever o ficheiro sem o favorito removido
+    with open(FAVOURITES_FILE, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(['id', 'user', 'song'])
+        for fav in favourites:
+            writer.writerow([fav['id'], fav['user'], fav['song']])
+    
+    return redirect("/favourites")
 
 @app.route("/logout")
 def logout():
