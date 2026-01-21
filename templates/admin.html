@@ -5,32 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- CSS personalizado -->
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
+<!-- Barra de navegação -->
 <header>{% include 'navbar.html' %}</header>
 
 <body class="bg-transparent">
+  <!-- Container principal -->
   <div class="container mx-auto px-6 pt-20">
     <div class="flex items-center justify-between mb-6">
+      <!-- Título -->
       <h2 class="text-4xl font-bold mb-8 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">Administração</h2>
     </div>
 
+    <!-- Formulário para adicionar utilizador -->
     <div class="mb-6">
       <form action="/admin/create" method="post" class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+        <!-- Campo nome -->
         <div>
           <label class="text-sm text-gray-300">Nome</label>
           <input name="nome" required class="mt-1 w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-white text-sm" />
         </div>
+        <!-- Campo email -->
         <div>
           <label class="text-sm text-gray-300">Email</label>
           <input name="email" type="email" required class="mt-1 w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-white text-sm" />
         </div>
+        <!-- Campo password -->
         <div>
           <label class="text-sm text-gray-300">Password</label>
           <input name="password" type="password" required class="mt-1 w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-white text-sm" />
         </div>
         <div class="flex gap-2">
+          <!-- Seletor de role -->
           <div class="flex-1">
             <label class="text-sm text-gray-300">Role</label>
             <select name="role" class="mt-1 w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-white text-sm">
@@ -38,23 +48,26 @@
               <option value="admin">admin</option>
             </select>
           </div>
+          <!-- Botão submeter -->
           <div class="flex items-center">
             <button type="submit" class="px-4 py-2 bg-gradient-to-r from-green-400 to-blue-500 text-black font-semibold rounded-lg hover:opacity-90 transition">Adicionar</button>
           </div>
         </div>
       </form>
     </div>
-
-    <!-- SEARCH FILTER -->
+    
+    <!-- Barra de pesquisa -->
     <div class="mb-4">
         <input type="text" id="searchInput" onkeyup="filterTable()" 
             placeholder="Pesquisar utilizadores..." 
             class="w-full bg-gray-900 text-white px-4 py-3 rounded-lg border border-white/10 focus:border-primary focus:outline-none">
     </div>
 
+    <!-- Tabela de utilizadores -->
     <div class="bg-gray-900 rounded-lg shadow overflow-hidden">
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-700">
+          <!-- Cabeçalho da tabela -->
           <thead class="bg-gray-800">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">ID</th>
@@ -64,12 +77,14 @@
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Ações</th>
             </tr>
           </thead>
+          <!-- Corpo da tabela com utilizadores -->
           <tbody class="bg-gray-900 divide-y divide-gray-700">
             {% for u in users %}
             <tr class="hover:bg-gray-800">
               <td class="px-6 py-4 text-sm text-gray-300">{{ u['id'] }}</td>
               <td class="px-6 py-4 text-sm text-white">{{ u['nome'] }}</td>
               <td class="px-6 py-4 text-sm text-gray-300">{{ u['email'] }}</td>
+              <!-- Role com badge -->
               <td class="px-6 py-4 text-sm">
                 {% if u['role'] == 'admin' %}
                   <span class="px-2 py-1 bg-green-600 text-white rounded-full text-xs font-semibold">admin</span>
@@ -77,6 +92,7 @@
                   <span class="px-2 py-1 bg-gray-700 text-white rounded-full text-xs font-semibold">user</span>
                 {% endif %}
               </td>
+              <!-- Ações -->
               <td class="px-6 py-4 text-sm space-x-2">
                 {% if u['role'] != 'admin' %}
                 <form action="/admin/promote/{{ u['id'] }}" method="post" class="inline">
@@ -104,40 +120,28 @@
     </div>
   </div>
 
+  <!-- Script para filtrar tabela -->
   <script>
     function filterTable() {
-        // Declare variables
-        var input, filter, table, tr, td, i, j, txtValue, found;
-        input = document.getElementById("searchInput");
-        filter = input.value.toUpperCase();
-        table = document.querySelector("table");
-        
+        var input = document.getElementById("searchInput");
+        var filter = input.value.toUpperCase();
+        var table = document.querySelector("table");
         if (!table) return;
         
-        tr = table.getElementsByTagName("tr");
-        
-        // Loop through all table rows (skip the header)
-        for (i = 1; i < tr.length; i++) {
-            found = false;
-            td = tr[i].getElementsByTagName("td");
-            
-            // Loop through all columns in the row (excluding the last actions column)
-            for (j = 0; j < td.length - 1; j++) {
+        var tr = table.getElementsByTagName("tr");
+        for (var i = 1; i < tr.length; i++) {
+            var found = false;
+            var td = tr[i].getElementsByTagName("td");
+            for (var j = 0; j < td.length - 1; j++) {
                 if (td[j]) {
-                    txtValue = td[j].textContent || td[j].innerText;
+                    var txtValue = td[j].textContent || td[j].innerText;
                     if (txtValue.toUpperCase().indexOf(filter) > -1) {
                         found = true;
                         break;
                     }
                 }
             }
-            
-            // Show or hide the row based on search results
-            if (found) {
-                tr[i].style.display = "";
-            } else {
-                tr[i].style.display = "none";
-            }
+            tr[i].style.display = found ? "" : "none";
         }
     }
   </script>

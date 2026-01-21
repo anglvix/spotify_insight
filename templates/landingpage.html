@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spotify Insight</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- CSS personalizado -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Fontes Google -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Configuração Tailwind -->
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -35,30 +38,30 @@
     </script>
 </head>
 
+<!-- Barra de navegação -->
 <header>{% include 'navbar.html' %}</header>
 
 <body class="min-h-screen flex flex-col">
-
-      <!-- Hero Section -->
-  <section class="flex-1 flex items-center justify-center hero-gradient">
-    <div class="container mx-auto px-6 text-center">
-      {% if is_logged_in %}
-      <button onclick="location.href='/dashboard'" class="mb-8 px-6 py-3 rounded-full bg-white/10 backdrop-blur border border-white/20 text-primary hover:bg-white/20 transition">
-        Explora as tuas estatísticas
-      </button>
-      {% else %}
-      <button onclick="location.href='/login'" class="mb-8 px-6 py-3 rounded-full bg-white/10 backdrop-blur border border-white/20 text-primary hover:bg-white/20 transition">
-        Explora as tuas estatísticas
-      </button>
-      {% endif %}
-      <h2 class="text-6xl font-bold mb-6">
-        Descobre a tua <span class="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">História Musical</span>
-      </h2>
-      <p class="text-xl text-white/70 max-w-3xl mx-auto">
-        Entre em uma nova dimensão musical e descubra informações exclusivas sobre o seu gosto musical.
-      </p>
-    </div>
-  </section>
-    
+    <!-- Secção hero principal -->
+    <section class="flex-1 flex items-center justify-center hero-gradient">
+        <div class="container mx-auto px-6 text-center">
+            {% if is_logged_in %}
+            <!-- Botão para dashboard -->
+            <button onclick="location.href='/dashboard'" class="mb-8 px-6 py-3 rounded-full bg-white/10 backdrop-blur border border-white/20 text-primary hover:bg-white/20 transition">
+                Explora as tuas estatísticas
+            </button>
+            {% else %}
+            <button onclick="location.href='/login'" class="mb-8 px-6 py-3 rounded-full bg-white/10 backdrop-blur border border-white/20 text-primary hover:bg-white/20 transition">
+                Explora as tuas estatísticas
+            </button>
+            {% endif %}
+            <h2 class="text-6xl font-bold mb-6">
+                Descobre a tua <span class="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">História Musical</span>
+            </h2>
+            <p class="text-xl text-white/70 max-w-3xl mx-auto">
+                Entre em uma nova dimensão musical e descubra informações exclusivas sobre o seu gosto musical.
+            </p>
+        </div>
+    </section>
 </body>
 </html>

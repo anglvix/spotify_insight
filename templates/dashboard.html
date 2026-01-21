@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- CSS personalizado -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Fontes Google -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Configuração Tailwind -->
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -35,16 +38,20 @@
     </script>
 </head>
 
+<!-- Barra de navegação -->
 <header>{% include 'navbar.html' %}</header>
 
 <body class="bg-transparent">
     <div class="container mx-auto px-6 pt-20">
+      <!-- Título -->
       <div class="flex items-center justify-between mb-6">
         <h2 class="text-4xl font-bold mb-8 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">Dashboard</h2>
       </div>
 
+      <!-- Secção de estatísticas -->
       <section class="mb-16">
         <h3 class="text-2xl font-bold text-white mb-6">Estatísticas</h3>
+        <!-- Grid de estatísticas -->
         <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
           <div class="bg-gray-900/50 rounded-lg p-6 border border-white/10 hover:border-primary/50 transition">
             <div class="text-4xl font-bold text-white mb-2">{{ stats.total_streams }}</div>
@@ -70,9 +77,11 @@
       </section>
 
       {% if stats.top_genres %}
+      <!-- Secção de géneros -->
       <section class="mb-16">
         <h3 class="text-2xl font-bold text-white mb-6">Principais Géneros</h3>
         {% if genre_graph %}
+        <!-- Gráfico de géneros -->
         <div class="flex justify-center mb-6">
           <div class="w-full max-w-lg">
             {{ genre_graph|safe }}
@@ -91,9 +100,12 @@
       {% endif %}
 
       <div class="space-y-8">
+        <!-- Secção do gráfico principal -->
         <section class="my-20">
+          <!-- Gráfico plotly -->
           {{ graph|safe }}
 
+          <!-- Formulário de filtros do gráfico -->
           <form method="get" class="mt-6 flex flex-wrap gap-4 items-end justify-center">
             <input type="hidden" name="filter_type" value="graph">
 
@@ -150,9 +162,11 @@
           </form>
         </section>
 
+        <!-- Secção da tabela de músicas -->
         <section>
-            <h3 class="text-3xl font-bold text-white mb-6">As suas músicas</h3>
+            <h3 class="text-3xl font-bold text-white mb-6">As suas músicas</h3> <!-- Subtítulo -->
 
+            <!-- Formulário de filtros da tabela -->
             <form method="get" class="mb-6 flex flex-wrap gap-4 items-end">
                 <input type="hidden" name="filter_type" value="table">
 
@@ -219,10 +233,9 @@
         </section>
       </div>
     </div>
-
-    <script>
-        let sortDirections = {}; // Guardar direção de ordenação para cada coluna
-
+!-- Scripts para filtros e ordenação -->
+    <script
+    <script> <!-- Scripts para filtros e ordenação -->
         // Filtro geral da tabela (barra de pesquisa)
         function filterTable() {
             var input, filter, table, tr, td, i, j, txtValue, found;
