@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"> <!-- Codificação UTF-8 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsivo -->
-    <title>Registo</title> <!-- Título da página -->
-    <script src="https://cdn.tailwindcss.com"></script> <!-- Framework Tailwind -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> <!-- CSS personalizado -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"> <!-- Fontes Google -->
-    <script> <!-- Configuração Tailwind -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- CSS personalizado -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Fontes Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Configuração Tailwind -->
+    <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
@@ -35,30 +38,35 @@
     </script>
 </head>
 
-<header>{% include 'navbar.html' %}</header> <!-- Barra de navegação -->
+<!-- Barra de navegação -->
+<header>{% include 'navbar.html' %}</header>
 
 <body class="min-h-screen flex flex-col">
   <!-- Secção de registo -->
   <section class="flex-1 flex items-center justify-center hero-gradient pt-20">
-    <div class="container mx-auto px-6"> <!-- Container principal -->
-      <div class="max-w-md mx-auto bg-white/5 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-white/10"> <!-- Card de registo -->
-        <h2 class="text-4xl font-bold mb-6 text-center bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">Registar</h2> <!-- Título -->
-        <!-- Formulário de registo -->
+    <div class="container mx-auto px-6">
+      <!-- Card de registo -->
+      <div class="max-w-md mx-auto bg-white/5 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-white/10">
+        <!-- Título -->
+        <h2 class="text-4xl font-bold mb-6 text-center bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">Registar</h2>
         <!-- Formulário de registo -->
         <form method="post" class="space-y-5">
-          <div> <!-- Campo nome -->
+          <!-- Campo nome -->
+          <div>
             <label class="block text-sm text-white/70 mb-2">Nome</label>
             <input name="nome" type="text" 
               class="w-full px-4 py-3 rounded-lg bg-gray-900/50 text-white border border-white/10 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition" 
               required>
           </div>
-          <div> <!-- Campo email -->
+          <!-- Campo email -->
+          <div>
             <label class="block text-sm text-white/70 mb-2">Email</label>
             <input name="email" type="email" 
               class="w-full px-4 py-3 rounded-lg bg-gray-900/50 text-white border border-white/10 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition" 
               required>
           </div>
-          <div> <!-- Campo password -->
+          <!-- Campo password -->
+          <div>
             <label class="block text-sm text-white/70 mb-2">Palavra-passe</label>
             <input name="password" type="password" 
               class="w-full px-4 py-3 rounded-lg bg-gray-900/50 text-white border border-white/10 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition" 

@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"> <!-- Codificação UTF-8 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsivo -->
-    <title>Dashboard</title> <!-- Título da página -->
-    <script src="https://cdn.tailwindcss.com"></script> <!-- Framework Tailwind -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> <!-- CSS personalizado -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"> <!-- Fontes Google -->
-    <script> <!-- Configuração Tailwind -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- CSS personalizado -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Fontes Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Configuração Tailwind -->
+    <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
@@ -35,18 +38,21 @@
     </script>
 </head>
 
-<header>{% include 'navbar.html' %}</header> <!-- Barra de navegação -->
+<!-- Barra de navegação -->
+<header>{% include 'navbar.html' %}</header>
 
 <body class="bg-transparent">
-    <div class="container mx-auto px-6 pt-20"> <!-- Container principal -->
+    <div class="container mx-auto px-6 pt-20">
+      <!-- Título -->
       <div class="flex items-center justify-between mb-6">
-        <h2 class="text-4xl font-bold mb-8 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">Dashboard</h2> <!-- Título -->
+        <h2 class="text-4xl font-bold mb-8 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">Dashboard</h2>
       </div>
 
       <!-- Secção de estatísticas -->
       <section class="mb-16">
-        <h3 class="text-2xl font-bold text-white mb-6">Estatísticas</h3> <!-- Subtítulo -->
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-6"> <!-- Grid de estatísticas -->
+        <h3 class="text-2xl font-bold text-white mb-6">Estatísticas</h3>
+        <!-- Grid de estatísticas -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
           <div class="bg-gray-900/50 rounded-lg p-6 border border-white/10 hover:border-primary/50 transition">
             <div class="text-4xl font-bold text-white mb-2">{{ stats.total_streams }}</div>
             <div class="text-gray-400 text-sm uppercase tracking-wide">reproduções</div>
@@ -70,11 +76,12 @@
         </div>
       </section>
 
-      {% if stats.top_genres %} <!-- Se existem géneros -->
+      {% if stats.top_genres %}
       <!-- Secção de géneros -->
       <section class="mb-16">
-        <h3 class="text-2xl font-bold text-white mb-6">Principais Géneros</h3> <!-- Subtítulo -->
-        {% if genre_graph %} <!-- Gráfico de géneros -->
+        <h3 class="text-2xl font-bold text-white mb-6">Principais Géneros</h3>
+        {% if genre_graph %}
+        <!-- Gráfico de géneros -->
         <div class="flex justify-center mb-6">
           <div class="w-full max-w-lg">
             {{ genre_graph|safe }}
@@ -95,7 +102,8 @@
       <div class="space-y-8">
         <!-- Secção do gráfico principal -->
         <section class="my-20">
-          {{ graph|safe }} <!-- Gráfico plotly -->
+          <!-- Gráfico plotly -->
+          {{ graph|safe }}
 
           <!-- Formulário de filtros do gráfico -->
           <form method="get" class="mt-6 flex flex-wrap gap-4 items-end justify-center">
@@ -225,7 +233,8 @@
         </section>
       </div>
     </div>
-
+!-- Scripts para filtros e ordenação -->
+    <script
     <script> <!-- Scripts para filtros e ordenação -->
         // Filtro geral da tabela (barra de pesquisa)
         function filterTable() {

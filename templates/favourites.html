@@ -1,24 +1,28 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-    <meta charset="UTF-8"> <!-- Codificação UTF-8 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsivo -->
-    <title>Favoritos - Spotify Insight</title> <!-- Título da página -->
-    <script src="https://cdn.tailwindcss.com"></script> <!-- Framework Tailwind -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> <!-- CSS personalizado -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"> <!-- Fontes Google -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favoritos - Spotify Insight</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- CSS personalizado -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Fontes Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
-<header>{% include 'navbar.html' %}</header> <!-- Barra de navegação -->
+<!-- Barra de navegação -->
+<header>{% include 'navbar.html' %}</header>
 
 <body class="bg-transparent">
-    <div class="container mx-auto px-6 pt-20"> <!-- Container principal -->
+    <div class="container mx-auto px-6 pt-20">
         <div class="max-w-6xl mx-auto">
-            <h1 class="text-4xl font-bold mb-8 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent"> <!-- Título -->
+            <!-- Título -->
+            <h1 class="text-4xl font-bold mb-8 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
                 As Minhas Músicas Favoritas
             </h1>
             
-            {% if favourites %} <!-- Se existem favoritos -->
+            {% if favourites %}
             <!-- Formulário de filtros -->
             <form method="get" class="mb-6 flex flex-wrap gap-4 items-end">
                 <div>
@@ -51,7 +55,7 @@
                 </button>
             </form>
 
-            <!-- Barra de pesquisa e botão limpar -->
+            <!-- Barra de pesquisa -->
             <div class="mb-4 flex gap-3">
                 <input type="text" id="searchInput" onkeyup="filterTable()" 
                     placeholder="Pesquisar na tabela..." 
@@ -69,7 +73,8 @@
             <div class="overflow-x-auto">
                 <div class="align-middle inline-block min-w-full shadow overflow-hidden sm:rounded-lg">
                     <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-800"> <!-- Cabeçalho da tabela -->
+                        <!-- Cabeçalho da tabela -->
+                        <thead class="bg-gray-800">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                                     Música
@@ -94,8 +99,9 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody class="bg-gray-900 divide-y divide-gray-700"> <!-- Corpo da tabela -->
-                            {% for fav in favourites %} <!-- Loop por cada favorito -->
+                        <!-- Corpo da tabela -->
+                        <tbody class="bg-gray-900 divide-y divide-gray-700">
+                            {% for fav in favourites %}
                             <tr class="hover:bg-gray-800 transition">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                                     {{ fav.song }}
@@ -128,7 +134,8 @@
                     </table>
                 </div>
             </div>
-            {% else %} <!-- Mensagem quando não há favoritos -->
+            {% else %}
+            <!-- Mensagem quando não há favoritos -->
             <div class="bg-gray-900/50 backdrop-blur-md rounded-2xl shadow-2xl border border-white/10 overflow-hidden">
                 <div class="p-12 text-center">
                     <svg class="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -137,8 +144,8 @@
                     <p class="text-gray-500 text-lg">Ainda não tem músicas favoritas.</p>
                     <p class="text-gray-600 text-sm mt-2">Adicione algumas músicas da página Dashboard!</p>
                 </div>
-                {% endif %}
             </div>
+            {% endif %}
             
             <div class="mt-6">
                 <a href="/dashboard" class="inline-block px-6 py-3 rounded-lg bg-gradient-to-r from-green-400 to-blue-500 text-black font-semibold hover:opacity-90 transition">
@@ -147,6 +154,8 @@
             </div>
         </div>
     </div>
+</body>
+</html>
 
     <script> <!-- Scripts para filtrar e ordenar -->
         let sortDirections = {}; // Guardar direção de ordenação para cada coluna
